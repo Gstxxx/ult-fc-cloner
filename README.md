@@ -1,475 +1,198 @@
-# 🏆 EA FC 25 Web App Scraper
+# EA FC 25 Web App Scraper
 
-[![GitHub stars](https://img.shields.io/github/stars/Gstxxx/ult-fc-cloner)](https://github.com/Gstxxx/ult-fc-cloner/stargazers)
-[![GitHub release](https://img.shields.io/github/v/release/Gstxxx/ult-fc-cloner)](https://github.com/Gstxxx/ult-fc-cloner/releases)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Selenium](https://img.shields.io/badge/Selenium-4.0+-green.svg)](https://selenium-python.readthedocs.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](https://github.com/Gstxxx/ult-fc-cloner/releases)
 
-Um scraper automatizado para coletar dados dos jogadores do seu clube no EA FC 25 Web App.
+Um scraper simples e eficiente para coletar dados dos jogadores do EA FC 25 Web App.
 
-## 🚀 **DOWNLOAD DIRETO**
-**[⬇️ Baixar Executável (v1.0.0)](https://github.com/Gstxxx/ult-fc-cloner/releases/latest/download/FC25_Scraper.exe)**
+## 🚀 Quick Start
 
-*Não precisa de Python instalado - apenas execute o arquivo .exe!*
+### Download do Executável
+- **Windows**: [FC25_Scraper_v1.0.0.zip](https://github.com/Gstxxx/ult-fc-cloner/releases/download/v1.0.0/FC25_Scraper_v1.0.0.zip) (31MB)
+- Extraia e execute `fc25_scraper.exe`
 
-## 📋 Descrição
-
-Este projeto permite coletar automaticamente informações de todos os jogadores do seu clube no EA FC 25 Web App, incluindo:
-- **Nome do jogador**
-- **Overall/Rating**
-- **Posição**
-- **Clube**
-- **Dados exportados em CSV**
-
-## ✨ Funcionalidades
-
-- 🔐 **Login automático** (opcional) ou manual
-- 📄 **Paginação automática** - coleta todos os jogadores de todas as páginas
-- 🎯 **Seletores precisos** - coleta apenas dados válidos dos jogadores
-- 📊 **Exportação CSV** - dados organizados e prontos para análise
-- 🛡️ **Tratamento de erros** - robusto e confiável
-- 🔄 **Navegação automática** - vai até a página de jogadores automaticamente
-
-## 🚀 Como Funciona
-
-### 1. **Acesso ao Web App**
-- Abre o Chrome automaticamente
-- Acessa o EA FC 25 Web App
-- Configura o navegador para evitar detecção de automação
-
-### 2. **Sistema de Login**
-- **Opção 1**: Login automático com credenciais
-- **Opção 2**: Login manual (recomendado)
-- **Opção 3**: Variáveis de ambiente
-
-### 3. **Navegação Inteligente**
-- Detecta automaticamente a página de jogadores
-- Navega para "Clube > Jogadores"
-- Fallback para navegação manual se necessário
-
-### 4. **Coleta de Dados**
-- Identifica cards de jogadores usando seletores precisos
-- Extrai dados de cada jogador individualmente
-- Filtra apenas jogadores válidos (sem "N/A")
-- Processa todas as páginas automaticamente
-
-### 5. **Paginação Automática**
-- Detecta botão "Próxima"
-- Navega por todas as páginas
-- Coleta todos os jogadores do clube
-- Para automaticamente na última página
-
-### 6. **Exportação**
-- Gera arquivo CSV com todos os dados
-- Preview dos dados coletados
-- Estatísticas da coleta
-
-## 📦 Instalação
-
-### Pré-requisitos
-- **Windows 10/11** (para executável)
-- **Google Chrome** instalado
-- **Conexão com internet**
-- **Conta EA FC 25**
-
-### 🎯 **Opção 1: Download Direto (Mais Fácil)**
-
-1. **Baixe o executável**
-   - Vá para [Releases](https://github.com/Gstxxx/ult-fc-cloner/releases)
-   - Baixe `FC25_Scraper.exe` (31MB)
-   - Ou baixe o pacote completo `FC25_Scraper_v1.0.0.zip`
-
-2. **Execute**
-   - Duplo clique no `FC25_Scraper.exe`
-   - Siga as instruções na tela
-
-### 🔧 **Opção 2: Build Local**
-
-#### 1. Clone o repositório
+### Instalação Python
 ```bash
+# Clone o repositório
 git clone https://github.com/Gstxxx/ult-fc-cloner.git
 cd ult-fc-cloner
-```
 
-#### 2. Execute o script de build
-```bash
-python build_exe.py
-```
-
-#### 3. Use o executável
-- Vá para a pasta `dist`
-- Execute `FC25_Scraper.exe` ou `Executar_Scraper.bat`
-
-### 🐍 **Opção 3: Execução via Python**
-
-#### 1. Clone o repositório
-```bash
-git clone https://github.com/Gstxxx/ult-fc-cloner.git
-cd ult-fc-cloner
-```
-
-#### 2. Crie um ambiente virtual
-```bash
-python -m venv .venv
-```
-
-#### 3. Ative o ambiente virtual
-```bash
-# Windows
-.venv\Scripts\activate
-
-# Linux/Mac
-source .venv/bin/activate
-```
-
-#### 4. Instale as dependências
-```bash
+# Instale as dependências
 pip install -r requirements.txt
+
+# Execute o scraper
+python fc25_scraper.py
 ```
 
-## ⚡ Quick Start
+## 📋 Pré-requisitos
 
-### Para Usuários Finais (Recomendado)
-1. **[Baixe o executável](https://github.com/Gstxxx/ult-fc-cloner/releases/latest)**
-2. **Execute** `FC25_Scraper.exe`
-3. **Faça login** no EA FC 25 Web App
-4. **Navegue** até "Clube > Jogadores"
-5. **Pressione ENTER** e aguarde a coleta
-6. **Resultado**: `jogadores_fc25.csv` gerado
-
----
+- **Python 3.8+** ou **Windows 10/11**
+- **Chrome Browser** instalado
+- **Conta EA** com acesso ao FC 25 Web App
+- **Conexão com internet** estável
 
 ## 🎯 Como Usar
 
-### 🚀 **Usando o Executável (Recomendado)**
-
-1. **Execute o executável**
-   - Baixe de [Releases](https://github.com/Gstxxx/ult-fc-cloner/releases)
-   - Execute `FC25_Scraper.exe`
-
-2. **Configure o login** (opcional)
-   - Escolha entre login automático ou manual
-   - Para login automático, insira email e senha
-   - Para login manual, continue com a opção 3
-
-3. **Faça login manualmente**
-   - O navegador abrirá o EA FC 25 Web App
-   - Faça login na sua conta EA
-   - Navegue até "Clube > Jogadores"
-   - Pressione ENTER no terminal
-
-4. **Aguarde a coleta**
-   - O scraper processará automaticamente todas as páginas
-   - Você verá o progresso em tempo real
-   - Todos os jogadores serão coletados
-
-5. **Resultado**
-   - Arquivo `jogadores_fc25.csv` será gerado
-   - Preview dos dados será mostrado
-   - Estatísticas da coleta serão exibidas
-
-### Usando Python
-
-#### Execução Simples
+### 1. Execução Simples
 ```bash
 python fc25_scraper.py
 ```
 
-#### Processo Completo
+### 2. Processo de Login
+1. O script abrirá o Chrome automaticamente
+2. Faça login na sua conta EA
+3. Navegue até **Clube > Jogadores**
+4. Pressione **ENTER** no terminal quando estiver pronto
 
-1. **Execute o script**
-   ```bash
-   python fc25_scraper.py
-   ```
-
-2. **Configure o login** (opcional)
-   - Escolha entre login automático ou manual
-   - Para login automático, insira email e senha
-   - Para login manual, continue com a opção 3
-
-3. **Faça login manualmente**
-   - O navegador abrirá o EA FC 25 Web App
-   - Faça login na sua conta EA
-   - Navegue até "Clube > Jogadores"
-   - Pressione ENTER no terminal
-
-4. **Aguarde a coleta**
-   - O scraper processará automaticamente todas as páginas
-   - Você verá o progresso em tempo real
-   - Todos os jogadores serão coletados
-
-5. **Resultado**
-   - Arquivo `jogadores_fc25.csv` será gerado
-   - Preview dos dados será mostrado
-   - Estatísticas da coleta serão exibidas
+### 3. Coleta Automática
+- O script coletará dados de todas as páginas automaticamente
+- Progresso mostrado no terminal
+- Dados exportados para `jogadores_fc25.csv`
 
 ## 📊 Dados Coletados
 
-### **Dados Básicos:**
-- **Nome**: Nome completo do jogador
-- **Overall**: Overall rating do jogador
-- **Posição**: Posição principal do jogador (ex: ST, CM, CB)
-- **Clube**: Clube atual do jogador
-- **Rating**: Rating geral (mesmo que Overall)
-
-### **Dados Expandidos:**
-- **Qualidade**: Tipo do card (Base, Special, Hero, Icon, TOTS, etc.)
-- **Nação**: Nacionalidade do jogador
-- **Liga**: Liga do jogador (ex: Icon, Premier League, etc.)
-- **Status**: Se o jogador é tradeable ou untradeable
-- **Posições_Alternativas**: Outras posições que o jogador pode jogar
-
-### **Estatísticas Detalhadas:**
-- **PAC**: Pace (Velocidade)
-- **SHO**: Shooting (Finalização)
-- **PAS**: Passing (Passe)
-- **DRI**: Dribbling (Drible)
-- **DEF**: Defending (Defesa)
-- **PHY**: Physical (Físico)
-
-### **Traits:**
-- **Traits**: Características especiais do jogador (ex: Pinged Pass, First Touch)
-
-## 📊 Exemplo de Saída
-
-### Arquivo CSV gerado:
-```csv
-Nome,Overall,Posição,Clube,Rating,Qualidade,Nação,Liga,PAC,SHO,PAS,DRI,DEF,PHY,Traits,Status,Posições_Alternativas
-Essien,97,CDM,N/A,97,Icon,Gana,Icon,85,73,89,85,90,91,Pinged Pass,First Touch,Tradeable,CM
-Kanu,97,ST,N/A,97,Icon,Nigéria,Icon,87,95,78,88,45,82,Power Header,Untradeable,
-Yıldız,96,LW,N/A,96,TOTS,Turquia,Super Lig,92,88,85,94,45,78,Flair,Untradeable,RW
-...
-```
-
-### Estatísticas típicas:
-```
-Total de jogadores coletados: 199
-Páginas processadas: 10
-Taxa de sucesso: 100%
-```
-
-## ⚙️ Configuração
-
-### Login Automático
-
-#### Opção 1: Inserir credenciais
-```bash
-python fc25_scraper.py
-# Escolha opção 1 e insira email/senha
-```
-
-#### Opção 2: Variáveis de ambiente
-```bash
-# Windows
-set EA_EMAIL=seu_email@exemplo.com
-set EA_PASSWORD=sua_senha
-
-# Linux/Mac
-export EA_EMAIL=seu_email@exemplo.com
-export EA_PASSWORD=sua_senha
-```
-
-### Configurações Avançadas
-
-Edite o arquivo `config.py` para personalizar:
-- Timeouts
-- Seletores CSS
-- Configurações do navegador
+| Campo | Descrição | Exemplo |
+|-------|-----------|---------|
+| `nome` | Nome do jogador | "Lionel Messi" |
+| `overall` | Overall do jogador | "91" |
+| `posicao` | Posição no campo | "RW" |
+| `clube` | Clube atual | "Inter Miami" |
 
 ## 📁 Estrutura do Projeto
 
 ```
 ult-fc-cloner/
-├── 📄 fc25_scraper.py          # Script principal
-├── ⚙️ config.py                # Configurações e credenciais
-├── 📦 requirements.txt         # Dependências Python
-├── 🔧 setup.py                # Configuração do projeto
-├── 🏗️ build_exe.py            # Script para criar executável
-├── 📋 fc25_scraper.spec       # Especificação PyInstaller
-├── 📝 file_version_info.txt   # Informações de versão do exe
-├── 📖 README.md               # Este arquivo
-├── 🚫 .gitignore              # Arquivos ignorados pelo Git
-├── 📁 .venv/                  # Ambiente virtual
-├── 📁 __pycache__/            # Cache Python
-├── 📁 build/                  # Arquivos de build (gerado)
-├── 📁 dist/                   # Executável final (gerado)
-│   ├── 🚀 FC25_Scraper.exe   # Executável principal
-│   └── 📜 Executar_Scraper.bat # Script de execução
-├── 📊 fc25_scraper.log        # Log de execução
-└── 📈 jogadores_fc25.csv      # Dados coletados
+├── fc25_scraper.py          # Script principal (150 linhas)
+├── requirements.txt         # Dependências Python
+├── README.md               # Este arquivo
+├── build_exe.py            # Script para criar executável
+├── create_release.py       # Script para criar releases
+├── dist/                   # Executável gerado
+└── build/                  # Arquivos de build
 ```
 
-## 🎯 Recursos Principais
+## 🔧 Desenvolvimento
 
-| Recurso | Descrição | Status |
-|---------|-----------|--------|
-| 🚀 **Executável Standalone** | Não precisa de Python | ✅ Disponível |
-| 🔐 **Login Automático** | Credenciais salvas | ✅ Funcional |
-| 📄 **Paginação Automática** | Coleta todas as páginas | ✅ Funcional |
-| 📊 **Exportação CSV** | Dados organizados | ✅ Funcional |
-| 🛡️ **Tratamento de Erros** | Robustez e confiabilidade | ✅ Funcional |
-| 🔄 **Navegação Inteligente** | Detecta páginas automaticamente | ✅ Funcional |
+### Instalação para Desenvolvimento
+```bash
+# Clone o repositório
+git clone https://github.com/Gstxxx/ult-fc-cloner.git
+cd ult-fc-cloner
 
-## 🛠️ Tecnologias Utilizadas
+# Crie um ambiente virtual
+python -m venv venv
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
 
-- **Python 3.8+** - Linguagem principal
-- **Selenium** - Automação do navegador
-- **ChromeDriver** - Driver do Chrome (gerenciado automaticamente)
-- **Pandas** - Manipulação de dados CSV
-- **WebDriver Manager** - Gerenciamento automático do driver
-
-## 🔍 Como Funciona Tecnicamente
-
-### 1. **Navegação**
-```python
-# Navegação para Club > Players
-"button.ut-tab-bar-item.icon-club"  # Botão Club na navbar
-"div.players-tile"                  # Tile Players no hub
-"h1:contains('Players')"           # Header Players
+# Instale dependências
+pip install -r requirements.txt
 ```
 
-### 2. **Detecção de Cards**
-```python
-# Seletor principal para cards de jogadores
-"li.listFUTItem"  # Container principal do card
-".name"           # Nome do jogador
-".rating"         # Overall/Rating
-".position"       # Posição
+### Criando Executável
+```bash
+# Execute o script de build
+python build_exe.py
+
+# Ou use PyInstaller diretamente
+pyinstaller fc25_scraper.spec
 ```
 
-### 3. **Extração de Dados Expandidos**
-```python
-# Estatísticas detalhadas
-".player-stats-data-component li"   # Container de stats
-".label"                           # Label da stat (PAC, SHO, etc.)
-".value"                           # Valor da stat
+### Criando Release
+```bash
+# Execute o script de release
+python create_release.py
 
-# Informações de nação/liga
-".ut-item-view--bio .ut-item-row"  # Seção bio
-".ut-item-row-label--left"         # Labels (IRE, ICN, etc.)
-
-# Traits
-".ut-item-view--traits .ut-item-row .ut-item-row-label--left"
-
-# Qualidade do card
-card.get_attribute('class')        # Classes CSS para determinar qualidade
+# Ou siga o guia manual
+# Ver: GUIA_RELEASE.md
 ```
 
-### 4. **Paginação**
-```python
-# Detecta botão "Próxima"
-"button.pagination.next"
-"button.flat.pagination.next"
+## 📦 Dependências
+
+```
+selenium>=4.0.0
+pandas>=1.3.0
+webdriver-manager>=3.8.0
+pyinstaller>=5.0.0  # Apenas para build
 ```
 
-### 5. **Extração de Dados**
-- Usa seletores CSS precisos
-- Valida dados antes de adicionar
-- Filtra cards vazios ou inválidos
-- Trata caracteres especiais
-- Extrai dados expandidos (stats, traits, qualidade)
+## 🛠️ Funcionalidades
 
-### 6. **Robustez**
-- Múltiplos métodos de inicialização do driver
-- Fallbacks para diferentes cenários
-- Tratamento de erros abrangente
-- Logs detalhados para debug
+### ✅ Implementadas
+- [x] Login manual seguro
+- [x] Coleta automática de dados
+- [x] Paginação automática
+- [x] Exportação CSV
+- [x] Preview dos dados
+- [x] Executável Windows
+- [x] Tratamento de erros
+- [x] Logs detalhados
 
-## ⚠️ Limitações e Considerações
-
-### Limitações
-- Requer login manual ou credenciais válidas
-- Depende da estrutura HTML do EA FC 25 Web App
-- Pode ser afetado por mudanças na interface
-- Requer conexão estável com a internet
-
-### Considerações de Segurança
-- **NUNCA** compartilhe suas credenciais
-- Use variáveis de ambiente para credenciais
-- O script não armazena senhas permanentemente
-- Recomendado usar login manual
-
-### Performance
-- Coleta ~200 jogadores em ~5-10 minutos
-- Depende da velocidade da internet
-- Pode ser mais lento com muitos jogadores
+### 🔄 Próximas Funcionalidades
+- [ ] Interface gráfica
+- [ ] Filtros por posição/overall
+- [ ] Exportação JSON/Excel
+- [ ] Coleta de preços do mercado
+- [ ] Análise estatística avançada
 
 ## 🐛 Solução de Problemas
 
-### Problema: "ChromeDriver não encontrado"
+### Erro: "ChromeDriver não encontrado"
 ```bash
 # Reinstale as dependências
 pip install --upgrade webdriver-manager selenium
 ```
 
-### Problema: "Nenhum jogador encontrado"
-- Verifique se está na página correta
-- Aguarde o carregamento completo
-- Tente navegar manualmente para "Clube > Jogadores"
+### Erro: "Elemento não encontrado"
+- Verifique se está na página correta (Clube > Jogadores)
+- Aguarde o carregamento completo da página
+- Tente novamente
 
-### Problema: "Botão Próxima não encontrado"
-- Verifique se há mais páginas
-- O script para automaticamente na última página
-- Isso é normal quando todos os jogadores foram coletados
+### Erro: "Timeout"
+- Verifique sua conexão com a internet
+- Feche outros programas que usam Chrome
+- Reinicie o script
 
-### Problema: "Erro de encoding"
-- O script trata caracteres especiais automaticamente
-- Verifique se o terminal suporta UTF-8
+## 📈 Estatísticas do Projeto
 
-## 📈 Melhorias Futuras
+- **Linhas de código**: 150 (vs 829 originais)
+- **Arquivos**: 1 script principal
+- **Dependências**: 4 pacotes essenciais
+- **Tempo de execução**: ~2-5 minutos
+- **Dados coletados**: ~100-1000 jogadores
 
-- [ ] Coleta de estatísticas detalhadas dos jogadores
-- [ ] Suporte a múltiplos clubes
-- [ ] Interface gráfica (GUI)
-- [ ] Análise automática dos dados
-- [ ] Comparação entre jogadores
-- [ ] Recomendações de formação
-- [ ] Exportação para outros formatos (JSON, Excel)
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Por favor:
+## 🤝 Contribuindo
 
 1. **Fork** o projeto
-2. **Crie** uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+2. Crie uma **branch** para sua feature (`git checkout -b feature/AmazingFeature`)
 3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. **Push** para a branch (`git push origin feature/AmazingFeature`)
-5. **Abra** um Pull Request
+5. Abra um **Pull Request**
 
-### 🐛 Reportar Bugs
-- Use [GitHub Issues](https://github.com/Gstxxx/ult-fc-cloner/issues)
-- Descreva o problema detalhadamente
-- Inclua logs de erro se possível
-
-### 💡 Sugerir Melhorias
-- Abra uma [Issue](https://github.com/Gstxxx/ult-fc-cloner/issues)
-- Descreva a funcionalidade desejada
-- Explique o benefício para a comunidade
-
-## 📊 Estatísticas do Projeto
-
-![GitHub stars](https://img.shields.io/github/stars/Gstxxx/ult-fc-cloner)
-![GitHub forks](https://img.shields.io/github/forks/Gstxxx/ult-fc-cloner)
-![GitHub issues](https://img.shields.io/github/issues/Gstxxx/ult-fc-cloner)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/Gstxxx/ult-fc-cloner)
+### Diretrizes de Contribuição
+- Mantenha o código simples e legível
+- Adicione comentários explicativos
+- Teste suas mudanças
+- Siga o padrão de commits
 
 ## 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## ⚖️ Disclaimer
+## 🙏 Agradecimentos
 
-Este scraper é para uso pessoal e educacional. Respeite os termos de serviço do EA e não use para fins comerciais ou maliciosos. O autor não se responsabiliza pelo uso inadequado.
+- **EA Sports** pelo FC 25 Web App
+- **Selenium** pela automação web
+- **Pandas** pelo processamento de dados
+- **PyInstaller** pela criação de executáveis
 
-## 🔗 Links Úteis
+## 📞 Suporte
 
-- **[Releases](https://github.com/Gstxxx/ult-fc-cloner/releases)** - Downloads e versões
-- **[Issues](https://github.com/Gstxxx/ult-fc-cloner/issues)** - Bugs e sugestões
-- **[Wiki](https://github.com/Gstxxx/ult-fc-cloner/wiki)** - Documentação detalhada
-- **[Discussions](https://github.com/Gstxxx/ult-fc-cloner/discussions)** - Comunidade
+- **Issues**: [GitHub Issues](https://github.com/Gstxxx/ult-fc-cloner/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Gstxxx/ult-fc-cloner/discussions)
+- **Wiki**: [Documentação](https://github.com/Gstxxx/ult-fc-cloner/wiki)
 
 ---
 
-**Desenvolvido com ❤️ para a comunidade EA FC 25**
-
-*Última atualização: Dezembro 2024* 
+**⭐ Se este projeto te ajudou, considere dar uma estrela no GitHub!** 
