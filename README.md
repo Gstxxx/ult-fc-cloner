@@ -1,151 +1,349 @@
-# EA FC 25 Web App Scraper
+# 🏆 EA FC 25 Web App Scraper
 
-Script automatizado para coletar dados dos jogadores do EA FC 25 Web App.
+Um scraper automatizado para coletar dados dos jogadores do seu clube no EA FC 25 Web App.
 
-## 🚀 Funcionalidades
+## 📋 Descrição
 
-- **Navegação Automática**: Clube → Jogadores
-- **Coleta Completa**: Todos os dados dos jogadores
-- **Exportação CSV**: Dados organizados em planilha
-- **Estatísticas**: Resumo da coleta
+Este projeto permite coletar automaticamente informações de todos os jogadores do seu clube no EA FC 25 Web App, incluindo:
+- **Nome do jogador**
+- **Overall/Rating**
+- **Posição**
+- **Clube**
+- **Dados exportados em CSV**
 
-## 📊 Dados Coletados
+## ✨ Funcionalidades
 
-### Informações Básicas
-- **Nome**: Nome do jogador
-- **Overall**: Rating geral
-- **Posição**: Posição principal (VOL, MC, etc.)
-- **Clube**: Clube atual
-- **Nação**: País de origem
-- **Liga**: Liga atual
-- **Qualidade**: Tipo do card (Base, Special, Icon, Hero)
+- 🔐 **Login automático** (opcional) ou manual
+- 📄 **Paginação automática** - coleta todos os jogadores de todas as páginas
+- 🎯 **Seletores precisos** - coleta apenas dados válidos dos jogadores
+- 📊 **Exportação CSV** - dados organizados e prontos para análise
+- 🛡️ **Tratamento de erros** - robusto e confiável
+- 🔄 **Navegação automática** - vai até a página de jogadores automaticamente
 
-### Estatísticas
-- **RIT**: Ritmo
-- **FIN**: Finalização  
-- **PAS**: Passe
-- **CON**: Controle
-- **DEF**: Defesa
-- **FÍS**: Físico
+## 🚀 Como Funciona
 
-### Status e Detalhes
-- **Status**: Tradeable/Untradeable
-- **Ativo**: Se está no elenco ativo
-- **Traits**: Características especiais
-- **Posições Alternativas**: Outras posições que pode jogar
+### 1. **Acesso ao Web App**
+- Abre o Chrome automaticamente
+- Acessa o EA FC 25 Web App
+- Configura o navegador para evitar detecção de automação
 
-## 🛠️ Instalação
+### 2. **Sistema de Login**
+- **Opção 1**: Login automático com credenciais
+- **Opção 2**: Login manual (recomendado)
+- **Opção 3**: Variáveis de ambiente
+
+### 3. **Navegação Inteligente**
+- Detecta automaticamente a página de jogadores
+- Navega para "Clube > Jogadores"
+- Fallback para navegação manual se necessário
+
+### 4. **Coleta de Dados**
+- Identifica cards de jogadores usando seletores precisos
+- Extrai dados de cada jogador individualmente
+- Filtra apenas jogadores válidos (sem "N/A")
+- Processa todas as páginas automaticamente
+
+### 5. **Paginação Automática**
+- Detecta botão "Próxima"
+- Navega por todas as páginas
+- Coleta todos os jogadores do clube
+- Para automaticamente na última página
+
+### 6. **Exportação**
+- Gera arquivo CSV com todos os dados
+- Preview dos dados coletados
+- Estatísticas da coleta
+
+## 📦 Instalação
 
 ### Pré-requisitos
 - Python 3.8+
 - Google Chrome
 - Conta EA FC 25
 
-### Dependências
+### 1. Clone o repositório
+```bash
+git clone <url-do-repositorio>
+cd ult-fc-cloner
+```
+
+### 2. Crie um ambiente virtual
+```bash
+python -m venv .venv
+```
+
+### 3. Ative o ambiente virtual
+```bash
+# Windows
+.venv\Scripts\activate
+
+# Linux/Mac
+source .venv/bin/activate
+```
+
+### 4. Instale as dependências
 ```bash
 pip install -r requirements.txt
 ```
 
 ## 🎯 Como Usar
 
-### 1. Execução Manual
+### Execução Simples
 ```bash
 python fc25_scraper.py
 ```
 
-### 2. Executável Windows
-```bash
-# Execute o arquivo
-dist/fc25_scraper.exe
-```
-
-## 📋 Fluxo de Uso
+### Processo Completo
 
 1. **Execute o script**
-2. **Faça login manual** na sua conta EA
-3. **Pressione ENTER** quando estiver logado
-4. **Aguarde** a navegação e coleta automática
-5. **Verifique** o arquivo `jogadores_fc25.csv`
+   ```bash
+   python fc25_scraper.py
+   ```
 
-## 📁 Arquivos Gerados
+2. **Configure o login** (opcional)
+   - Escolha entre login automático ou manual
+   - Para login automático, insira email e senha
+   - Para login manual, continue com a opção 3
 
-- `jogadores_fc25.csv`: Dados completos dos jogadores
-- Estatísticas no console: Resumo da coleta
+3. **Faça login manualmente**
+   - O navegador abrirá o EA FC 25 Web App
+   - Faça login na sua conta EA
+   - Navegue até "Clube > Jogadores"
+   - Pressione ENTER no terminal
 
-## 🔧 Build do Executável
+4. **Aguarde a coleta**
+   - O scraper processará automaticamente todas as páginas
+   - Você verá o progresso em tempo real
+   - Todos os jogadores serão coletados
 
+5. **Resultado**
+   - Arquivo `jogadores_fc25.csv` será gerado
+   - Preview dos dados será mostrado
+   - Estatísticas da coleta serão exibidas
+
+## 📊 Dados Coletados
+
+### **Dados Básicos:**
+- **Nome**: Nome completo do jogador
+- **Overall**: Overall rating do jogador
+- **Posição**: Posição principal do jogador (ex: ST, CM, CB)
+- **Clube**: Clube atual do jogador
+- **Rating**: Rating geral (mesmo que Overall)
+
+### **Dados Expandidos:**
+- **Qualidade**: Tipo do card (Base, Special, Hero, Icon, TOTS, etc.)
+- **Nação**: Nacionalidade do jogador
+- **Liga**: Liga do jogador (ex: Icon, Premier League, etc.)
+- **Status**: Se o jogador é tradeable ou untradeable
+- **Posições_Alternativas**: Outras posições que o jogador pode jogar
+
+### **Estatísticas Detalhadas:**
+- **PAC**: Pace (Velocidade)
+- **SHO**: Shooting (Finalização)
+- **PAS**: Passing (Passe)
+- **DRI**: Dribbling (Drible)
+- **DEF**: Defending (Defesa)
+- **PHY**: Physical (Físico)
+
+### **Traits:**
+- **Traits**: Características especiais do jogador (ex: Pinged Pass, First Touch)
+
+## 📊 Exemplo de Saída
+
+### Arquivo CSV gerado:
+```csv
+Nome,Overall,Posição,Clube,Rating,Qualidade,Nação,Liga,PAC,SHO,PAS,DRI,DEF,PHY,Traits,Status,Posições_Alternativas
+Essien,97,CDM,N/A,97,Icon,Gana,Icon,85,73,89,85,90,91,Pinged Pass,First Touch,Tradeable,CM
+Kanu,97,ST,N/A,97,Icon,Nigéria,Icon,87,95,78,88,45,82,Power Header,Untradeable,
+Yıldız,96,LW,N/A,96,TOTS,Turquia,Super Lig,92,88,85,94,45,78,Flair,Untradeable,RW
+...
+```
+
+### Estatísticas típicas:
+```
+Total de jogadores coletados: 199
+Páginas processadas: 10
+Taxa de sucesso: 100%
+```
+
+## ⚙️ Configuração
+
+### Login Automático
+
+#### Opção 1: Inserir credenciais
 ```bash
-python build_exe.py
+python fc25_scraper.py
+# Escolha opção 1 e insira email/senha
 ```
 
-O executável será criado em `dist/fc25_scraper.exe`
+#### Opção 2: Variáveis de ambiente
+```bash
+# Windows
+set EA_EMAIL=seu_email@exemplo.com
+set EA_PASSWORD=sua_senha
 
-## 📈 Exemplo de Saída
-
-```
-============================================================
-EA FC 25 WEB APP SCRAPER
-============================================================
-1. Configurando driver do Chrome...
-2. Acessando EA FC 25 Web App...
-3. Aguardando login manual...
-
-==================================================
-LOGIN MANUAL REQUERIDO
-==================================================
-1. Faça login na sua conta EA no navegador
-2. Pressione ENTER quando estiver logado
-3. O programa fará a navegação e coleta automaticamente
-==================================================
-
-4. Navegando para Clube...
-✅ Navegação para Clube concluída
-5. Navegando para Jogadores...
-✅ Navegação para Jogadores concluída
-6. Coletando dados dos jogadores...
-Iniciando coleta de dados...
-Processando página 1...
-Encontrados 24 jogadores na página 1
-Coleta concluída! Total: 254 jogadores
-7. Exportando dados...
-
-CSV exportado: jogadores_fc25.csv
-Total de jogadores: 254
-Overall médio: 78.2
-Posições únicas: 8
-Clubes únicos: 15
-Qualidades únicas: 4
-Tradeable: 180
-Untradeable: 74
-Ativos: 23
-
-🎉 Scraping concluído com sucesso!
-📊 Verifique o arquivo 'jogadores_fc25.csv'
+# Linux/Mac
+export EA_EMAIL=seu_email@exemplo.com
+export EA_PASSWORD=sua_senha
 ```
 
-## 🎮 Compatibilidade
+### Configurações Avançadas
 
-- ✅ EA FC 25 Web App
-- ✅ Windows 10/11
-- ✅ Google Chrome
-- ✅ Conta EA válida
+Edite o arquivo `config.py` para personalizar:
+- Timeouts
+- Seletores CSS
+- Configurações do navegador
 
-## 📝 Notas
+## 🔧 Estrutura do Projeto
 
-- **Login Manual**: Sempre necessário fazer login manualmente
-- **Navegação Automática**: Após login, tudo é automatizado
-- **Dados Completos**: Coleta todas as informações disponíveis
-- **Exportação CSV**: Formato compatível com Excel/Google Sheets
+```
+ult-fc-cloner/
+├── fc25_scraper.py      # Script principal
+├── config.py            # Configurações e credenciais
+├── requirements.txt     # Dependências Python
+├── setup.py            # Configuração do projeto
+├── README.md           # Este arquivo
+├── .gitignore          # Arquivos ignorados pelo Git
+├── .venv/              # Ambiente virtual
+├── __pycache__/        # Cache Python
+├── fc25_scraper.log    # Log de execução
+└── jogadores_fc25.csv  # Dados coletados
+```
 
-## 🔄 Atualizações
+## 🛠️ Tecnologias Utilizadas
 
-- **v2.0**: Fluxo automatizado completo
-- **v1.0**: Versão inicial com coleta manual
+- **Python 3.8+** - Linguagem principal
+- **Selenium** - Automação do navegador
+- **ChromeDriver** - Driver do Chrome (gerenciado automaticamente)
+- **Pandas** - Manipulação de dados CSV
+- **WebDriver Manager** - Gerenciamento automático do driver
 
-## 📞 Suporte
+## 🔍 Como Funciona Tecnicamente
 
-Para dúvidas ou problemas, abra uma issue no GitHub.
+### 1. **Navegação**
+```python
+# Navegação para Club > Players
+"button.ut-tab-bar-item.icon-club"  # Botão Club na navbar
+"div.players-tile"                  # Tile Players no hub
+"h1:contains('Players')"           # Header Players
+```
+
+### 2. **Detecção de Cards**
+```python
+# Seletor principal para cards de jogadores
+"li.listFUTItem"  # Container principal do card
+".name"           # Nome do jogador
+".rating"         # Overall/Rating
+".position"       # Posição
+```
+
+### 3. **Extração de Dados Expandidos**
+```python
+# Estatísticas detalhadas
+".player-stats-data-component li"   # Container de stats
+".label"                           # Label da stat (PAC, SHO, etc.)
+".value"                           # Valor da stat
+
+# Informações de nação/liga
+".ut-item-view--bio .ut-item-row"  # Seção bio
+".ut-item-row-label--left"         # Labels (IRE, ICN, etc.)
+
+# Traits
+".ut-item-view--traits .ut-item-row .ut-item-row-label--left"
+
+# Qualidade do card
+card.get_attribute('class')        # Classes CSS para determinar qualidade
+```
+
+### 4. **Paginação**
+```python
+# Detecta botão "Próxima"
+"button.pagination.next"
+"button.flat.pagination.next"
+```
+
+### 5. **Extração de Dados**
+- Usa seletores CSS precisos
+- Valida dados antes de adicionar
+- Filtra cards vazios ou inválidos
+- Trata caracteres especiais
+- Extrai dados expandidos (stats, traits, qualidade)
+
+### 6. **Robustez**
+- Múltiplos métodos de inicialização do driver
+- Fallbacks para diferentes cenários
+- Tratamento de erros abrangente
+- Logs detalhados para debug
+
+## ⚠️ Limitações e Considerações
+
+### Limitações
+- Requer login manual ou credenciais válidas
+- Depende da estrutura HTML do EA FC 25 Web App
+- Pode ser afetado por mudanças na interface
+- Requer conexão estável com a internet
+
+### Considerações de Segurança
+- **NUNCA** compartilhe suas credenciais
+- Use variáveis de ambiente para credenciais
+- O script não armazena senhas permanentemente
+- Recomendado usar login manual
+
+### Performance
+- Coleta ~200 jogadores em ~5-10 minutos
+- Depende da velocidade da internet
+- Pode ser mais lento com muitos jogadores
+
+## 🐛 Solução de Problemas
+
+### Problema: "ChromeDriver não encontrado"
+```bash
+# Reinstale as dependências
+pip install --upgrade webdriver-manager selenium
+```
+
+### Problema: "Nenhum jogador encontrado"
+- Verifique se está na página correta
+- Aguarde o carregamento completo
+- Tente navegar manualmente para "Clube > Jogadores"
+
+### Problema: "Botão Próxima não encontrado"
+- Verifique se há mais páginas
+- O script para automaticamente na última página
+- Isso é normal quando todos os jogadores foram coletados
+
+### Problema: "Erro de encoding"
+- O script trata caracteres especiais automaticamente
+- Verifique se o terminal suporta UTF-8
+
+## 📈 Melhorias Futuras
+
+- [ ] Coleta de estatísticas detalhadas dos jogadores
+- [ ] Suporte a múltiplos clubes
+- [ ] Interface gráfica (GUI)
+- [ ] Análise automática dos dados
+- [ ] Comparação entre jogadores
+- [ ] Recomendações de formação
+- [ ] Exportação para outros formatos (JSON, Excel)
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto é para uso educacional e pessoal. Respeite os termos de uso do EA FC 25.
+
+## ⚖️ Disclaimer
+
+Este scraper é para uso pessoal e educacional. Respeite os termos de serviço do EA e não use para fins comerciais ou maliciosos. O autor não se responsabiliza pelo uso inadequado.
 
 ---
 
-**Desenvolvido para facilitar a análise de elencos do EA FC 25** ⚽ 
+**Desenvolvido com ❤️ para a comunidade EA FC 25**
+
+*Última atualização: Julho 2025* 
