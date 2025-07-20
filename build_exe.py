@@ -2,181 +2,175 @@
 # -*- coding: utf-8 -*-
 """
 Script para construir o executável do EA FC 25 Web App Scraper
+Versão simplificada - sem config.py
 """
 
 import os
 import sys
-import subprocess
 import shutil
+import subprocess
 from pathlib import Path
 
 def verificar_python():
-    """Verifica se a versão do Python é compatível"""
-    if sys.version_info < (3, 8):
-        print("❌ Python 3.8 ou superior é necessário")
-        print(f"Versão atual: {sys.version}")
-        return False
-    print(f"✅ Python {sys.version.split()[0]} - OK")
+    """Verifica a versão do Python"""
+    print("✅ Python {}.{}.{} - OK".format(*sys.version_info[:3]))
     return True
 
-def instalar_dependencias():
-    """Instala as dependências necessárias"""
-    try:
-        print("📦 Instalando dependências...")
-        
-        # Instala as dependências básicas
-        result = subprocess.run([
-            sys.executable, "-m", "pip", "install", "-r", "requirements.txt"
-        ], capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            print("✅ Dependências instaladas com sucesso!")
-            return True
-        else:
-            print("❌ Erro ao instalar dependências:")
-            print(result.stderr)
-            return False
-            
-    except Exception as e:
-        print(f"❌ Erro durante instalação: {str(e)}")
-        return False
-
-def limpar_builds_anteriores():
-    """Remove builds anteriores"""
-    try:
-        print("🧹 Limpando builds anteriores...")
-        
-        # Remove diretórios de build
-        dirs_para_remover = ['build', 'dist', '__pycache__']
-        for dir_name in dirs_para_remover:
-            if os.path.exists(dir_name):
-                shutil.rmtree(dir_name)
-                print(f"   Removido: {dir_name}")
-        
-        # Remove arquivos .spec antigos (exceto o nosso)
-        for file in os.listdir('.'):
-            if file.endswith('.spec') and file != 'fc25_scraper.spec':
-                os.remove(file)
-                print(f"   Removido: {file}")
-        
-        print("✅ Limpeza concluída!")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Erro durante limpeza: {str(e)}")
-        return False
-
-def verificar_arquivos_necessarios():
-    """Verifica se todos os arquivos necessários existem"""
+def verificar_arquivos():
+    """Verifica se os arquivos necessários existem"""
+    print("🔍 Verificando arquivos necessários...")
+    
     arquivos_necessarios = [
         'fc25_scraper.py',
-        'config.py',
         'requirements.txt',
-        'fc25_scraper.spec',
-        'file_version_info.txt'
+        'fc25_scraper.spec'
     ]
     
-    print("🔍 Verificando arquivos necessários...")
+    todos_ok = True
     for arquivo in arquivos_necessarios:
         if os.path.exists(arquivo):
             print(f"   ✅ {arquivo}")
         else:
             print(f"   ❌ {arquivo} - NÃO ENCONTRADO")
-            return False
+            todos_ok = False
     
-    print("✅ Todos os arquivos necessários encontrados!")
-    return True
+    return todos_ok
+
+def limpar_builds_anteriores():
+    """Remove builds anteriores"""
+    print("🧹 Limpando builds anteriores...")
+    
+    pastas_para_limpar = ['build', 'dist', '__pycache__']
+    
+    for pasta in pastas_para_limpar:
+        if os.path.exists(pasta):
+            try:
+                shutil.rmtree(pasta)
+                print(f"   ✅ {pasta} removida")
+            except Exception as e:
+                print(f"   ⚠️ Erro ao remover {pasta}: {e}")
+
+def instalar_dependencias():
+    """Instala as dependências necessárias"""
+    print("📦 Instalando dependências...")
+    
+    try:
+        subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'], 
+                      check=True, capture_output=True, text=True)
+        print("   ✅ Dependências instaladas")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"   ❌ Erro ao instalar dependências: {e}")
+        return False
 
 def construir_executavel():
     """Constrói o executável usando PyInstaller"""
+    print("🔨 Construindo executável...")
+    
     try:
-        print("🔨 Construindo executável...")
-        print("   Isso pode levar alguns minutos...")
-        
         # Comando PyInstaller
         cmd = [
-            sys.executable, "-m", "PyInstaller",
-            "--clean",
-            "--noconfirm",
-            "fc25_scraper.spec"
+            sys.executable, '-m', 'PyInstaller',
+            '--onefile',
+            '--windowed',
+            '--name=fc25_scraper',
+            '--add-data=requirements.txt;.',
+            'fc25_scraper.py'
         ]
         
-        # Executa o comando
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        print(f"   Executando: {' '.join(cmd)}")
         
-        if result.returncode == 0:
-            print("✅ Executável construído com sucesso!")
-            return True
-        else:
-            print("❌ Erro ao construir executável:")
-            print(result.stderr)
-            return False
-            
-    except Exception as e:
-        print(f"❌ Erro durante construção: {str(e)}")
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print("   ✅ Executável construído com sucesso!")
+        return True
+        
+    except subprocess.CalledProcessError as e:
+        print(f"   ❌ Erro ao construir executável: {e}")
+        print(f"   Erro: {e.stderr}")
         return False
 
 def verificar_executavel():
-    """Verifica se o executável foi criado corretamente"""
-    exe_path = Path("dist/FC25_Scraper.exe")
+    """Verifica se o executável foi criado"""
+    print("🔍 Verificando executável...")
     
-    if exe_path.exists():
-        size_mb = exe_path.stat().st_size / (1024 * 1024)
-        print(f"✅ Executável criado: {exe_path}")
-        print(f"   Tamanho: {size_mb:.1f} MB")
+    executavel_path = os.path.join('dist', 'fc25_scraper.exe')
+    
+    if os.path.exists(executavel_path):
+        tamanho = os.path.getsize(executavel_path) / (1024 * 1024)  # MB
+        print(f"   ✅ Executável criado: {executavel_path}")
+        print(f"   📏 Tamanho: {tamanho:.1f} MB")
         return True
     else:
-        print("❌ Executável não encontrado em dist/FC25_Scraper.exe")
+        print(f"   ❌ Executável não encontrado: {executavel_path}")
         return False
 
 def criar_arquivo_batch():
     """Cria um arquivo .bat para facilitar a execução"""
-    try:
-        batch_content = """@echo off
+    print("📝 Criando arquivo batch...")
+    
+    batch_content = """@echo off
 echo ========================================
-echo    EA FC 25 Web App Scraper
+echo EA FC 25 WEB APP SCRAPER
 echo ========================================
 echo.
-echo Iniciando o scraper...
+echo Iniciando scraper...
 echo.
-FC25_Scraper.exe
+fc25_scraper.exe
 echo.
 echo Pressione qualquer tecla para sair...
-pause >nul
+pause > nul
 """
-        
-        with open("dist/Executar_Scraper.bat", "w", encoding="utf-8") as f:
+    
+    try:
+        with open(os.path.join('dist', 'Executar_Scraper.bat'), 'w', encoding='utf-8') as f:
             f.write(batch_content)
-        
-        print("✅ Arquivo batch criado: dist/Executar_Scraper.bat")
+        print("   ✅ Arquivo batch criado: Executar_Scraper.bat")
         return True
-        
     except Exception as e:
-        print(f"❌ Erro ao criar arquivo batch: {str(e)}")
+        print(f"   ❌ Erro ao criar arquivo batch: {e}")
         return False
 
-def mostrar_instrucoes():
-    """Mostra instruções de uso"""
-    print("\n" + "="*60)
-    print("🎉 EXECUTÁVEL CRIADO COM SUCESSO!")
-    print("="*60)
-    print()
-    print("📁 Arquivos criados:")
-    print("   • dist/FC25_Scraper.exe - Executável principal")
-    print("   • dist/Executar_Scraper.bat - Script de execução")
-    print()
-    print("🚀 Como usar:")
-    print("   1. Vá para a pasta 'dist'")
-    print("   2. Execute 'FC25_Scraper.exe' ou 'Executar_Scraper.bat'")
-    print("   3. Siga as instruções na tela")
-    print()
-    print("⚠️  IMPORTANTE:")
-    print("   • O Google Chrome deve estar instalado")
-    print("   • Uma conexão com a internet é necessária")
-    print("   • O executável pode ser movido para qualquer pasta")
-    print()
-    print("📊 Dados coletados serão salvos como 'jogadores_fc25.csv'")
-    print("="*60)
+def criar_instrucoes():
+    """Cria arquivo de instruções"""
+    print("📖 Criando instruções...")
+    
+    instrucoes = """EA FC 25 WEB APP SCRAPER - INSTRUÇÕES
+
+COMO USAR:
+1. Execute fc25_scraper.exe ou Executar_Scraper.bat
+2. Faça login na sua conta EA no navegador
+3. Navegue até 'Clube > Jogadores'
+4. Pressione ENTER quando estiver pronto
+5. Aguarde a coleta automática
+6. Verifique o arquivo jogadores_fc25.csv
+
+REQUISITOS:
+- Windows 10/11
+- Google Chrome instalado
+- Conta EA com acesso ao FC 25 Web App
+- Conexão com internet
+
+DADOS COLETADOS:
+- Nome, Overall, Posição, Clube
+- Nação, Liga, Qualidade do card
+- Estatísticas: PAC, SHO, PAS, DRI, DEF, PHY
+- Traits, Status, Posições alternativas
+
+SUPORTE:
+- GitHub: https://github.com/Gstxxx/ult-fc-cloner
+- Issues: https://github.com/Gstxxx/ult-fc-cloner/issues
+
+Desenvolvido com ❤️ para a comunidade EA FC 25
+"""
+    
+    try:
+        with open(os.path.join('dist', 'INSTRUCOES.txt'), 'w', encoding='utf-8') as f:
+            f.write(instrucoes)
+        print("   ✅ Instruções criadas: INSTRUCOES.txt")
+        return True
+    except Exception as e:
+        print(f"   ❌ Erro ao criar instruções: {e}")
+        return False
 
 def main():
     """Função principal"""
@@ -184,35 +178,60 @@ def main():
     print("🔨 CONSTRUTOR DE EXECUTÁVEL - EA FC 25 SCRAPER")
     print("="*60)
     
-    # Verifica Python
+    # 1. Verifica Python
     if not verificar_python():
-        sys.exit(1)
+        return False
     
-    # Verifica arquivos
-    if not verificar_arquivos_necessarios():
-        sys.exit(1)
+    # 2. Verifica arquivos
+    if not verificar_arquivos():
+        print("\n❌ Arquivos necessários não encontrados!")
+        return False
     
-    # Instala dependências
+    # 3. Limpa builds anteriores
+    limpar_builds_anteriores()
+    
+    # 4. Instala dependências
     if not instalar_dependencias():
-        sys.exit(1)
+        print("\n❌ Erro ao instalar dependências!")
+        return False
     
-    # Limpa builds anteriores
-    if not limpar_builds_anteriores():
-        sys.exit(1)
-    
-    # Constrói executável
+    # 5. Constrói executável
     if not construir_executavel():
-        sys.exit(1)
+        print("\n❌ Erro ao construir executável!")
+        return False
     
-    # Verifica resultado
+    # 6. Verifica executável
     if not verificar_executavel():
-        sys.exit(1)
+        print("\n❌ Executável não foi criado!")
+        return False
     
-    # Cria arquivo batch
+    # 7. Cria arquivos adicionais
     criar_arquivo_batch()
+    criar_instrucoes()
     
-    # Mostra instruções
-    mostrar_instrucoes()
+    print("\n" + "="*60)
+    print("🎉 BUILD CONCLUÍDO COM SUCESSO!")
+    print("="*60)
+    print("📁 Arquivos criados em: dist/")
+    print("   - fc25_scraper.exe (executável principal)")
+    print("   - Executar_Scraper.bat (script de execução)")
+    print("   - INSTRUCOES.txt (instruções de uso)")
+    print("\n🚀 Para usar:")
+    print("   1. Vá para a pasta dist/")
+    print("   2. Execute fc25_scraper.exe")
+    print("   3. Siga as instruções na tela")
+    print("="*60)
+    
+    return True
 
 if __name__ == "__main__":
-    main() 
+    try:
+        success = main()
+        if not success:
+            sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n⚠️ Build cancelado pelo usuário")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Erro inesperado: {e}")
+        sys.exit(1) 

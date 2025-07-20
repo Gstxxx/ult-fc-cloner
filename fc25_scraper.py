@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 EA FC 25 Web App Scraper
-Script simples para coletar dados dos jogadores do EA FC 25 Web App
+Script automatizado para coletar dados dos jogadores do EA FC 25 Web App
 """
 
 import time
 import pandas as pd
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -17,156 +18,256 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
 def setup_driver():
-    """Configura o driver do Chrome"""
+    """Configura o driver do Chrome com perfil persistente"""
     try:
         chrome_options = Options()
+        
+        # Configurações para perfil persistente
+        user_data_dir = os.path.join(os.getcwd(), "chrome_profile")
+        chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+        chrome_options.add_argument("--profile-directory=Default")
+        
+        # Configurações de performance
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-web-security")
+        chrome_options.add_argument("--allow-running-insecure-content")
+        
+        # Remove indicadores de automação
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option('useAutomationExtension', False)
         
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        # Tenta usar ChromeDriver Manager
+        try:
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+        except:
+            # Fallback: usa Chrome sem service
+            driver = webdriver.Chrome(options=chrome_options)
+        
+        # Remove indicadores de automação
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         
         return driver, WebDriverWait(driver, 20)
     except Exception as e:
         print(f"Erro ao configurar driver: {e}")
-        return None, None
+        print("Tentando configuração alternativa...")
+        
+        try:
+            # Configuração alternativa sem perfil persistente
+            chrome_options = Options()
+            chrome_options.add_argument("--start-maximized")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            
+            driver = webdriver.Chrome(options=chrome_options)
+            return driver, WebDriverWait(driver, 20)
+        except Exception as e2:
+            print(f"Erro na configuração alternativa: {e2}")
+            return None, None
 
-def aguardar_login():
-    """Aguarda o usuário fazer login manualmente"""
+def aguardar_login_inicial():
+    """Aguarda o usuário fazer login inicial (apenas na primeira vez)"""
     print("\n" + "="*50)
-    print("LOGIN MANUAL REQUERIDO")
+    print("LOGIN INICIAL REQUERIDO")
     print("="*50)
-    print("1. Faça login na sua conta EA no navegador")
-    print("2. Navegue até 'Clube > Jogadores'")
-    print("3. Pressione ENTER quando estiver pronto")
+    print("1. Faça login na sua conta EA")
+    print("2. Pressione ENTER quando estiver logado")
+    print("3. Nas próximas execuções, o login será automático")
     print("="*50)
     
-    input("Pressione ENTER quando estiver na página de jogadores...")
+    input("Pressione ENTER quando estiver logado...")
     return True
 
-def extrair_estatisticas_detalhadas(card):
-    """Extrai estatísticas detalhadas do jogador"""
-    stats = {}
-    
+def verificar_se_logado(driver, wait):
+    """Verifica se o usuário está logado"""
     try:
-        # Procura pela seção de estatísticas
-        stats_container = card.find_element(By.CSS_SELECTOR, '.player-stats-data-component')
-        stats_items = stats_container.find_elements(By.CSS_SELECTOR, 'li')
+        # Procura por elementos que indicam que está logado
+        elementos_logado = [
+            'nav.ut-tab-bar',  # Navbar do FUT
+            'div.ut-content',  # Conteúdo do FUT
+            'button.ut-tab-bar-item'  # Botões da navbar
+        ]
         
-        for item in stats_items:
+        for seletor in elementos_logado:
             try:
-                label = item.find_element(By.CSS_SELECTOR, '.label').text.strip()
-                value = item.find_element(By.CSS_SELECTOR, '.value').text.strip()
-                stats[label] = value
+                elemento = driver.find_element(By.CSS_SELECTOR, seletor)
+                if elemento.is_displayed():
+                    return True
             except:
                 continue
-                
+        
+        return False
+    except:
+        return False
+
+def fazer_login_automatico(driver, wait):
+    """Faz login automático se necessário"""
+    try:
+        # Procura pelo botão de login
+        botao_login = driver.find_element(By.CSS_SELECTOR, 'button.btn-standard.call-to-action')
+        if botao_login.is_displayed():
+            print("Clicando no botão de login...")
+            botao_login.click()
+            time.sleep(3)
+            return True
     except:
         pass
     
-    return stats
+    return False
 
-def extrair_informacoes_bio(card):
-    """Extrai informações de nação, liga e qualidade"""
-    info = {'nacao': 'N/A', 'liga': 'N/A', 'qualidade': 'N/A'}
-    
+def navegar_para_clube(driver, wait):
+    """Navega para a seção Clube"""
     try:
-        # Procura pela seção bio
-        bio_section = card.find_element(By.CSS_SELECTOR, '.ut-item-view--bio')
-        bio_rows = bio_section.find_elements(By.CSS_SELECTOR, '.ut-item-row')
+        print("Navegando para Clube...")
         
-        for row in bio_rows:
-            try:
-                label = row.find_element(By.CSS_SELECTOR, '.ut-item-row-label--left').text.strip()
-                value = row.find_element(By.CSS_SELECTOR, '.ut-item-row-label--right').text.strip()
-                
-                if 'IRE' in label or 'Nation' in label:
-                    info['nacao'] = value
-                elif 'ICN' in label or 'League' in label:
-                    info['liga'] = value
-                elif 'Quality' in label:
-                    info['qualidade'] = value
-                    
-            except:
-                continue
-                
-    except:
-        pass
-    
-    return info
+        # Procura pelo botão Clube na navbar
+        botao_clube = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.ut-tab-bar-item.icon-club')))
+        botao_clube.click()
+        
+        time.sleep(3)
+        print("✅ Navegação para Clube concluída")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Erro ao navegar para Clube: {e}")
+        return False
 
-def extrair_traits(card):
-    """Extrai traits do jogador"""
-    traits = []
-    
+def navegar_para_jogadores(driver, wait):
+    """Navega para a seção de jogadores"""
     try:
-        # Procura pela seção de traits
-        traits_section = card.find_element(By.CSS_SELECTOR, '.ut-item-view--traits')
-        traits_items = traits_section.find_elements(By.CSS_SELECTOR, '.ut-item-row .ut-item-row-label--left')
+        print("Navegando para Jogadores...")
         
-        for item in traits_items:
-            trait = item.text.strip()
-            if trait and trait != 'Traits':
-                traits.append(trait)
-                
-    except:
-        pass
-    
-    return ', '.join(traits) if traits else 'N/A'
+        # Procura pelo tile de jogadores
+        tile_jogadores = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.tile.col-1-1-md.players-tile')))
+        tile_jogadores.click()
+        
+        time.sleep(3)
+        print("✅ Navegação para Jogadores concluída")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Erro ao navegar para Jogadores: {e}")
+        return False
 
-def determinar_qualidade_card(card):
-    """Determina a qualidade do card baseado nas classes CSS"""
+def extrair_dados_jogador(card):
+    """Extrai dados completos de um jogador"""
     try:
-        classes = card.get_attribute('class')
+        # Dados básicos
+        nome = card.find_element(By.CSS_SELECTOR, 'div.name').text.strip()
+        overall = card.find_element(By.CSS_SELECTOR, 'div.rating').text.strip()
+        posicao = card.find_element(By.CSS_SELECTOR, 'div.position').text.strip()
         
-        if 'icon' in classes.lower():
-            return 'Icon'
-        elif 'hero' in classes.lower():
-            return 'Hero'
-        elif 'tots' in classes.lower():
-            return 'TOTS'
-        elif 'toty' in classes.lower():
-            return 'TOTY'
-        elif 'special' in classes.lower():
-            return 'Special'
-        else:
-            return 'Base'
+        # Verifica se é untradeable
+        try:
+            nome_element = card.find_element(By.CSS_SELECTOR, 'div.name.untradeable')
+            status = 'Untradeable'
+        except:
+            status = 'Tradeable'
+        
+        # Extrai estatísticas
+        stats = {}
+        try:
+            stats_container = card.find_element(By.CSS_SELECTOR, 'div.player-stats-data-component ul')
+            stats_items = stats_container.find_elements(By.CSS_SELECTOR, 'li')
             
-    except:
-        return 'N/A'
-
-def extrair_posicoes_alternativas(card):
-    """Extrai posições alternativas do jogador"""
-    posicoes = []
-    
-    try:
-        # Procura por posições alternativas
-        alt_positions = card.find_elements(By.CSS_SELECTOR, '.position-alt')
-        for pos in alt_positions:
-            pos_text = pos.text.strip()
-            if pos_text:
-                posicoes.append(pos_text)
-                
-    except:
-        pass
-    
-    return ', '.join(posicoes) if posicoes else 'N/A'
-
-def verificar_status_tradeable(card):
-    """Verifica se o jogador é tradeable ou untradeable"""
-    try:
-        # Procura por indicadores de status
-        untradeable_indicators = card.find_elements(By.CSS_SELECTOR, '.untradeable-indicator')
-        if untradeable_indicators:
-            return 'Untradeable'
-        else:
-            return 'Tradeable'
-    except:
-        return 'N/A'
+            for item in stats_items:
+                label = item.find_element(By.CSS_SELECTOR, 'span.label').text.strip()
+                value = item.find_element(By.CSS_SELECTOR, 'span.value').text.strip()
+                stats[label] = value
+        except:
+            pass
+        
+        # Extrai informações bio
+        bio_info = {'nacao': 'N/A', 'liga': 'N/A', 'clube': 'N/A'}
+        try:
+            bio_section = card.find_element(By.CSS_SELECTOR, 'div.ut-item-view--bio')
+            bio_rows = bio_section.find_elements(By.CSS_SELECTOR, 'div.ut-item-row')
+            
+            for i, row in enumerate(bio_rows):
+                try:
+                    label = row.find_element(By.CSS_SELECTOR, 'span.ut-item-row-label--left').text.strip()
+                    if i == 0:  # Primeira linha é nação
+                        bio_info['nacao'] = label
+                    elif i == 1:  # Segunda linha é liga
+                        bio_info['liga'] = label
+                    elif i == 2:  # Terceira linha é clube
+                        bio_info['clube'] = label
+                except:
+                    continue
+        except:
+            pass
+        
+        # Extrai posições alternativas
+        posicoes_alt = 'N/A'
+        try:
+            pos_header = card.find_element(By.CSS_SELECTOR, 'div.ut-item-view--positions-header')
+            posicoes_alt = pos_header.find_element(By.CSS_SELECTOR, 'span.otherPositions').text.strip()
+            if posicoes_alt.startswith(', '):
+                posicoes_alt = posicoes_alt[2:]
+        except:
+            pass
+        
+        # Extrai traits
+        traits = []
+        try:
+            traits_section = card.find_element(By.CSS_SELECTOR, 'div.ut-item-view--traits')
+            traits_items = traits_section.find_elements(By.CSS_SELECTOR, 'div.ut-item-row span.ut-item-row-label--left')
+            
+            for item in traits_items:
+                trait = item.text.strip()
+                if trait and trait != 'Traits':
+                    traits.append(trait)
+        except:
+            pass
+        
+        # Determina qualidade do card
+        qualidade = 'Base'
+        try:
+            classes = card.get_attribute('class')
+            if 'specials' in classes:
+                qualidade = 'Special'
+            elif 'icon' in classes:
+                qualidade = 'Icon'
+            elif 'hero' in classes:
+                qualidade = 'Hero'
+        except:
+            pass
+        
+        # Verifica se está ativo
+        ativo = False
+        try:
+            ativo_indicator = card.find_element(By.CSS_SELECTOR, 'div.ut-list-tag-view.ut-list-active-tag-view')
+            ativo = True
+        except:
+            pass
+        
+        return {
+            'nome': nome,
+            'overall': overall,
+            'posicao': posicao,
+            'clube': bio_info['clube'],
+            'rating': overall,
+            'qualidade': qualidade,
+            'nacao': bio_info['nacao'],
+            'liga': bio_info['liga'],
+            'PAC': stats.get('RIT', 'N/A'),
+            'SHO': stats.get('FIN', 'N/A'),
+            'PAS': stats.get('PAS', 'N/A'),
+            'DRI': stats.get('CON', 'N/A'),
+            'DEF': stats.get('DEF', 'N/A'),
+            'PHY': stats.get('FÍS', 'N/A'),
+            'traits': ', '.join(traits) if traits else 'N/A',
+            'status': status,
+            'posicoes_alternativas': posicoes_alt,
+            'ativo': 'Sim' if ativo else 'Não'
+        }
+        
+    except Exception as e:
+        print(f"Erro ao extrair dados do jogador: {e}")
+        return None
 
 def coletar_jogadores(driver, wait):
     """Coleta dados de todos os jogadores"""
@@ -183,7 +284,7 @@ def coletar_jogadores(driver, wait):
         
         # Procura pelos cards de jogadores
         try:
-            cards = driver.find_elements(By.CSS_SELECTOR, 'li.listFUTItem')
+            cards = driver.find_elements(By.CSS_SELECTOR, 'div.small.player.item')
             if not cards:
                 print("Nenhum jogador encontrado nesta página")
                 break
@@ -193,58 +294,9 @@ def coletar_jogadores(driver, wait):
             # Extrai dados de cada jogador
             for card in cards:
                 try:
-                    # Dados básicos
-                    nome = card.find_element(By.CSS_SELECTOR, '.name').text.strip()
-                    overall = card.find_element(By.CSS_SELECTOR, '.rating').text.strip()
-                    posicao = card.find_element(By.CSS_SELECTOR, '.position').text.strip()
-                    
-                    # Dados adicionais básicos
-                    try:
-                        clube = card.find_element(By.CSS_SELECTOR, '.club').text.strip()
-                    except:
-                        clube = 'N/A'
-                    
-                    # Extrai estatísticas detalhadas
-                    stats = extrair_estatisticas_detalhadas(card)
-                    
-                    # Extrai informações bio
-                    bio_info = extrair_informacoes_bio(card)
-                    
-                    # Extrai traits
-                    traits = extrair_traits(card)
-                    
-                    # Determina qualidade do card
-                    qualidade = determinar_qualidade_card(card)
-                    
-                    # Extrai posições alternativas
-                    posicoes_alt = extrair_posicoes_alternativas(card)
-                    
-                    # Verifica status tradeable
-                    status = verificar_status_tradeable(card)
-                    
-                    # Adiciona jogador se tem dados válidos
-                    if nome and overall and posicao:
-                        jogador = {
-                            'nome': nome,
-                            'overall': overall,
-                            'posicao': posicao,
-                            'clube': clube,
-                            'rating': overall,  # Mesmo que overall
-                            'qualidade': qualidade,
-                            'nacao': bio_info['nacao'],
-                            'liga': bio_info['liga'],
-                            'PAC': stats.get('PAC', 'N/A'),
-                            'SHO': stats.get('SHO', 'N/A'),
-                            'PAS': stats.get('PAS', 'N/A'),
-                            'DRI': stats.get('DRI', 'N/A'),
-                            'DEF': stats.get('DEF', 'N/A'),
-                            'PHY': stats.get('PHY', 'N/A'),
-                            'traits': traits,
-                            'status': status,
-                            'posicoes_alternativas': posicoes_alt
-                        }
-                        jogadores.append(jogador)
-                        
+                    dados = extrair_dados_jogador(card)
+                    if dados and dados['nome'] and dados['overall']:
+                        jogadores.append(dados)
                 except Exception as e:
                     continue
             
@@ -278,10 +330,13 @@ def gerar_estatisticas(jogadores):
     
     stats = {
         'total_jogadores': len(df),
-        'overall_medio': df['overall'].astype(str).str.extract('(\d+)').astype(float).mean(),
+        'overall_medio': df['overall'].astype(str).str.extract(r'(\d+)').astype(float).mean(),
         'posicoes_unicas': df['posicao'].nunique(),
         'clubes_unicos': df['clube'].nunique(),
-        'qualidades_unicas': df['qualidade'].nunique()
+        'qualidades_unicas': df['qualidade'].nunique(),
+        'tradeable': len(df[df['status'] == 'Tradeable']),
+        'untradeable': len(df[df['status'] == 'Untradeable']),
+        'ativos': len(df[df['ativo'] == 'Sim'])
     }
     
     return stats
@@ -305,6 +360,9 @@ def exportar_csv(jogadores, filename="jogadores_fc25.csv"):
         print(f"Posições únicas: {stats['posicoes_unicas']}")
         print(f"Clubes únicos: {stats['clubes_unicos']}")
         print(f"Qualidades únicas: {stats['qualidades_unicas']}")
+        print(f"Tradeable: {stats['tradeable']}")
+        print(f"Untradeable: {stats['untradeable']}")
+        print(f"Ativos: {stats['ativos']}")
         
         print("\nPrimeiros jogadores:")
         print(df.head().to_string(index=False))
@@ -321,7 +379,7 @@ def main():
     
     try:
         print("="*60)
-        print("EA FC 25 WEB APP SCRAPER")
+        print("EA FC 25 WEB APP SCRAPER - AUTOMATIZADO")
         print("="*60)
         
         # 1. Configura driver
@@ -335,20 +393,39 @@ def main():
         driver.get("https://www.ea.com/ea-sports-fc/ultimate-team/web-app/")
         time.sleep(5)
         
-        # 3. Aguarda login manual
-        print("3. Aguardando login manual...")
-        if not aguardar_login():
+        # 3. Verifica se está logado
+        print("3. Verificando status de login...")
+        if not verificar_se_logado(driver, wait):
+            print("Usuário não está logado")
+            
+            # Tenta fazer login automático
+            if not fazer_login_automatico(driver, wait):
+                # Se não conseguir, pede login manual
+                if not aguardar_login_inicial():
+                    return
+        else:
+            print("✅ Usuário já está logado!")
+        
+        # 4. Navega para Clube
+        print("4. Navegando para Clube...")
+        if not navegar_para_clube(driver, wait):
             return
         
-        # 4. Coleta dados
-        print("4. Coletando dados dos jogadores...")
+        # 5. Navega para Jogadores
+        print("5. Navegando para Jogadores...")
+        if not navegar_para_jogadores(driver, wait):
+            return
+        
+        # 6. Coleta dados
+        print("6. Coletando dados dos jogadores...")
         jogadores = coletar_jogadores(driver, wait)
         
-        # 5. Exporta dados
-        print("5. Exportando dados...")
+        # 7. Exporta dados
+        print("7. Exportando dados...")
         if exportar_csv(jogadores):
             print("\n🎉 Scraping concluído com sucesso!")
             print("📊 Verifique o arquivo 'jogadores_fc25.csv'")
+            print("💾 Login salvo para próximas execuções")
         else:
             print("\n❌ Erro ao exportar dados")
         
