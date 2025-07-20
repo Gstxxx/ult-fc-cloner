@@ -53,18 +53,62 @@ python fc25_scraper.py
 
 ## 📊 Dados Coletados
 
+### **Dados Básicos:**
 | Campo | Descrição | Exemplo |
 |-------|-----------|---------|
 | `nome` | Nome do jogador | "Lionel Messi" |
 | `overall` | Overall do jogador | "91" |
 | `posicao` | Posição no campo | "RW" |
 | `clube` | Clube atual | "Inter Miami" |
+| `rating` | Rating geral | "91" |
+
+### **Informações Detalhadas:**
+| Campo | Descrição | Exemplo |
+|-------|-----------|---------|
+| `qualidade` | Tipo do card | "Icon", "Hero", "TOTS", "Base" |
+| `nacao` | Nacionalidade | "Argentina" |
+| `liga` | Liga do jogador | "Icon", "Premier League" |
+| `status` | Tradeable/Untradeable | "Tradeable" |
+| `posicoes_alternativas` | Outras posições | "LW, ST" |
+
+### **Estatísticas Detalhadas:**
+| Campo | Descrição | Exemplo |
+|-------|-----------|---------|
+| `PAC` | Pace (Velocidade) | "85" |
+| `SHO` | Shooting (Finalização) | "92" |
+| `PAS` | Passing (Passe) | "91" |
+| `DRI` | Dribbling (Drible) | "95" |
+| `DEF` | Defending (Defesa) | "35" |
+| `PHY` | Physical (Físico) | "65" |
+
+### **Características Especiais:**
+| Campo | Descrição | Exemplo |
+|-------|-----------|---------|
+| `traits` | Traits do jogador | "Pinged Pass, First Touch" |
+
+## 📊 Exemplo de Saída
+
+### Arquivo CSV gerado:
+```csv
+nome,overall,posicao,clube,rating,qualidade,nacao,liga,PAC,SHO,PAS,DRI,DEF,PHY,traits,status,posicoes_alternativas
+Lionel Messi,91,RW,Inter Miami,91,Icon,Argentina,Icon,85,92,91,95,35,65,Pinged Pass,Tradeable,LW
+Cristiano Ronaldo,89,ST,Al Nassr,89,Base,Portugal,Saudi Pro League,89,93,82,88,35,75,Power Header,Untradeable,CF
+```
+
+### Estatísticas típicas:
+```
+Total de jogadores: 199
+Overall médio: 82.3
+Posições únicas: 15
+Clubes únicos: 45
+Qualidades únicas: 8
+```
 
 ## 📁 Estrutura do Projeto
 
 ```
 ult-fc-cloner/
-├── fc25_scraper.py          # Script principal (150 linhas)
+├── fc25_scraper.py          # Script principal (300 linhas)
 ├── requirements.txt         # Dependências Python
 ├── README.md               # Este arquivo
 ├── build_exe.py            # Script para criar executável
@@ -121,10 +165,16 @@ pyinstaller>=5.0.0  # Apenas para build
 
 ### ✅ Implementadas
 - [x] Login manual seguro
-- [x] Coleta automática de dados
+- [x] Coleta automática de dados completos
+- [x] Estatísticas detalhadas (PAC, SHO, PAS, DRI, DEF, PHY)
+- [x] Informações de nação e liga
+- [x] Qualidade do card (Icon, Hero, TOTS, etc.)
+- [x] Traits dos jogadores
+- [x] Status tradeable/untradeable
+- [x] Posições alternativas
 - [x] Paginação automática
-- [x] Exportação CSV
-- [x] Preview dos dados
+- [x] Exportação CSV completa
+- [x] Estatísticas da coleta
 - [x] Executável Windows
 - [x] Tratamento de erros
 - [x] Logs detalhados
@@ -156,11 +206,12 @@ pip install --upgrade webdriver-manager selenium
 
 ## 📈 Estatísticas do Projeto
 
-- **Linhas de código**: 150 (vs 829 originais)
+- **Linhas de código**: 300 (vs 829 originais)
 - **Arquivos**: 1 script principal
 - **Dependências**: 4 pacotes essenciais
-- **Tempo de execução**: ~2-5 minutos
+- **Tempo de execução**: ~3-8 minutos
 - **Dados coletados**: ~100-1000 jogadores
+- **Campos por jogador**: 16 informações detalhadas
 
 ## 🤝 Contribuindo
 

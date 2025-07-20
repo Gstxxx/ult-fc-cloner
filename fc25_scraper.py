@@ -48,6 +48,126 @@ def aguardar_login():
     input("Pressione ENTER quando estiver na página de jogadores...")
     return True
 
+def extrair_estatisticas_detalhadas(card):
+    """Extrai estatísticas detalhadas do jogador"""
+    stats = {}
+    
+    try:
+        # Procura pela seção de estatísticas
+        stats_container = card.find_element(By.CSS_SELECTOR, '.player-stats-data-component')
+        stats_items = stats_container.find_elements(By.CSS_SELECTOR, 'li')
+        
+        for item in stats_items:
+            try:
+                label = item.find_element(By.CSS_SELECTOR, '.label').text.strip()
+                value = item.find_element(By.CSS_SELECTOR, '.value').text.strip()
+                stats[label] = value
+            except:
+                continue
+                
+    except:
+        pass
+    
+    return stats
+
+def extrair_informacoes_bio(card):
+    """Extrai informações de nação, liga e qualidade"""
+    info = {'nacao': 'N/A', 'liga': 'N/A', 'qualidade': 'N/A'}
+    
+    try:
+        # Procura pela seção bio
+        bio_section = card.find_element(By.CSS_SELECTOR, '.ut-item-view--bio')
+        bio_rows = bio_section.find_elements(By.CSS_SELECTOR, '.ut-item-row')
+        
+        for row in bio_rows:
+            try:
+                label = row.find_element(By.CSS_SELECTOR, '.ut-item-row-label--left').text.strip()
+                value = row.find_element(By.CSS_SELECTOR, '.ut-item-row-label--right').text.strip()
+                
+                if 'IRE' in label or 'Nation' in label:
+                    info['nacao'] = value
+                elif 'ICN' in label or 'League' in label:
+                    info['liga'] = value
+                elif 'Quality' in label:
+                    info['qualidade'] = value
+                    
+            except:
+                continue
+                
+    except:
+        pass
+    
+    return info
+
+def extrair_traits(card):
+    """Extrai traits do jogador"""
+    traits = []
+    
+    try:
+        # Procura pela seção de traits
+        traits_section = card.find_element(By.CSS_SELECTOR, '.ut-item-view--traits')
+        traits_items = traits_section.find_elements(By.CSS_SELECTOR, '.ut-item-row .ut-item-row-label--left')
+        
+        for item in traits_items:
+            trait = item.text.strip()
+            if trait and trait != 'Traits':
+                traits.append(trait)
+                
+    except:
+        pass
+    
+    return ', '.join(traits) if traits else 'N/A'
+
+def determinar_qualidade_card(card):
+    """Determina a qualidade do card baseado nas classes CSS"""
+    try:
+        classes = card.get_attribute('class')
+        
+        if 'icon' in classes.lower():
+            return 'Icon'
+        elif 'hero' in classes.lower():
+            return 'Hero'
+        elif 'tots' in classes.lower():
+            return 'TOTS'
+        elif 'toty' in classes.lower():
+            return 'TOTY'
+        elif 'special' in classes.lower():
+            return 'Special'
+        else:
+            return 'Base'
+            
+    except:
+        return 'N/A'
+
+def extrair_posicoes_alternativas(card):
+    """Extrai posições alternativas do jogador"""
+    posicoes = []
+    
+    try:
+        # Procura por posições alternativas
+        alt_positions = card.find_elements(By.CSS_SELECTOR, '.position-alt')
+        for pos in alt_positions:
+            pos_text = pos.text.strip()
+            if pos_text:
+                posicoes.append(pos_text)
+                
+    except:
+        pass
+    
+    return ', '.join(posicoes) if posicoes else 'N/A'
+
+def verificar_status_tradeable(card):
+    """Verifica se o jogador é tradeable ou untradeable"""
+    try:
+        # Procura por indicadores de status
+        untradeable_indicators = card.find_elements(By.CSS_SELECTOR, '.untradeable-indicator')
+        if untradeable_indicators:
+            return 'Untradeable'
+        else:
+            return 'Tradeable'
+    except:
+        return 'N/A'
+
 def coletar_jogadores(driver, wait):
     """Coleta dados de todos os jogadores"""
     jogadores = []
@@ -78,11 +198,29 @@ def coletar_jogadores(driver, wait):
                     overall = card.find_element(By.CSS_SELECTOR, '.rating').text.strip()
                     posicao = card.find_element(By.CSS_SELECTOR, '.position').text.strip()
                     
-                    # Dados adicionais (se disponíveis)
+                    # Dados adicionais básicos
                     try:
                         clube = card.find_element(By.CSS_SELECTOR, '.club').text.strip()
                     except:
                         clube = 'N/A'
+                    
+                    # Extrai estatísticas detalhadas
+                    stats = extrair_estatisticas_detalhadas(card)
+                    
+                    # Extrai informações bio
+                    bio_info = extrair_informacoes_bio(card)
+                    
+                    # Extrai traits
+                    traits = extrair_traits(card)
+                    
+                    # Determina qualidade do card
+                    qualidade = determinar_qualidade_card(card)
+                    
+                    # Extrai posições alternativas
+                    posicoes_alt = extrair_posicoes_alternativas(card)
+                    
+                    # Verifica status tradeable
+                    status = verificar_status_tradeable(card)
                     
                     # Adiciona jogador se tem dados válidos
                     if nome and overall and posicao:
@@ -90,7 +228,20 @@ def coletar_jogadores(driver, wait):
                             'nome': nome,
                             'overall': overall,
                             'posicao': posicao,
-                            'clube': clube
+                            'clube': clube,
+                            'rating': overall,  # Mesmo que overall
+                            'qualidade': qualidade,
+                            'nacao': bio_info['nacao'],
+                            'liga': bio_info['liga'],
+                            'PAC': stats.get('PAC', 'N/A'),
+                            'SHO': stats.get('SHO', 'N/A'),
+                            'PAS': stats.get('PAS', 'N/A'),
+                            'DRI': stats.get('DRI', 'N/A'),
+                            'DEF': stats.get('DEF', 'N/A'),
+                            'PHY': stats.get('PHY', 'N/A'),
+                            'traits': traits,
+                            'status': status,
+                            'posicoes_alternativas': posicoes_alt
                         }
                         jogadores.append(jogador)
                         
@@ -118,6 +269,23 @@ def coletar_jogadores(driver, wait):
     print(f"Coleta concluída! Total: {len(jogadores)} jogadores")
     return jogadores
 
+def gerar_estatisticas(jogadores):
+    """Gera estatísticas da coleta"""
+    if not jogadores:
+        return {}
+    
+    df = pd.DataFrame(jogadores)
+    
+    stats = {
+        'total_jogadores': len(df),
+        'overall_medio': df['overall'].astype(str).str.extract('(\d+)').astype(float).mean(),
+        'posicoes_unicas': df['posicao'].nunique(),
+        'clubes_unicos': df['clube'].nunique(),
+        'qualidades_unicas': df['qualidade'].nunique()
+    }
+    
+    return stats
+
 def exportar_csv(jogadores, filename="jogadores_fc25.csv"):
     """Exporta dados para CSV"""
     try:
@@ -128,8 +296,16 @@ def exportar_csv(jogadores, filename="jogadores_fc25.csv"):
         df = pd.DataFrame(jogadores)
         df.to_csv(filename, index=False, encoding='utf-8-sig')
         
+        # Gera estatísticas
+        stats = gerar_estatisticas(jogadores)
+        
         print(f"\nCSV exportado: {filename}")
-        print(f"Total de jogadores: {len(df)}")
+        print(f"Total de jogadores: {stats['total_jogadores']}")
+        print(f"Overall médio: {stats['overall_medio']:.1f}")
+        print(f"Posições únicas: {stats['posicoes_unicas']}")
+        print(f"Clubes únicos: {stats['clubes_unicos']}")
+        print(f"Qualidades únicas: {stats['qualidades_unicas']}")
+        
         print("\nPrimeiros jogadores:")
         print(df.head().to_string(index=False))
         
