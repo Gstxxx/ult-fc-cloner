@@ -18,22 +18,15 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
 def setup_driver():
-    """Configura o driver do Chrome com perfil persistente"""
+    """Configura o driver do Chrome"""
     try:
         chrome_options = Options()
-        
-        # Configurações para perfil persistente
-        user_data_dir = os.path.join(os.getcwd(), "chrome_profile")
-        chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-        chrome_options.add_argument("--profile-directory=Default")
         
         # Configurações de performance
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-web-security")
-        chrome_options.add_argument("--allow-running-insecure-content")
         
         # Remove indicadores de automação
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -56,7 +49,7 @@ def setup_driver():
         print("Tentando configuração alternativa...")
         
         try:
-            # Configuração alternativa sem perfil persistente
+            # Configuração alternativa
             chrome_options = Options()
             chrome_options.add_argument("--start-maximized")
             chrome_options.add_argument("--no-sandbox")
@@ -68,55 +61,18 @@ def setup_driver():
             print(f"Erro na configuração alternativa: {e2}")
             return None, None
 
-def aguardar_login_inicial():
-    """Aguarda o usuário fazer login inicial (apenas na primeira vez)"""
+def aguardar_login():
+    """Aguarda o usuário fazer login manualmente"""
     print("\n" + "="*50)
-    print("LOGIN INICIAL REQUERIDO")
+    print("LOGIN MANUAL REQUERIDO")
     print("="*50)
-    print("1. Faça login na sua conta EA")
+    print("1. Faça login na sua conta EA no navegador")
     print("2. Pressione ENTER quando estiver logado")
-    print("3. Nas próximas execuções, o login será automático")
+    print("3. O programa fará a navegação e coleta automaticamente")
     print("="*50)
     
     input("Pressione ENTER quando estiver logado...")
     return True
-
-def verificar_se_logado(driver, wait):
-    """Verifica se o usuário está logado"""
-    try:
-        # Procura por elementos que indicam que está logado
-        elementos_logado = [
-            'nav.ut-tab-bar',  # Navbar do FUT
-            'div.ut-content',  # Conteúdo do FUT
-            'button.ut-tab-bar-item'  # Botões da navbar
-        ]
-        
-        for seletor in elementos_logado:
-            try:
-                elemento = driver.find_element(By.CSS_SELECTOR, seletor)
-                if elemento.is_displayed():
-                    return True
-            except:
-                continue
-        
-        return False
-    except:
-        return False
-
-def fazer_login_automatico(driver, wait):
-    """Faz login automático se necessário"""
-    try:
-        # Procura pelo botão de login
-        botao_login = driver.find_element(By.CSS_SELECTOR, 'button.btn-standard.call-to-action')
-        if botao_login.is_displayed():
-            print("Clicando no botão de login...")
-            botao_login.click()
-            time.sleep(3)
-            return True
-    except:
-        pass
-    
-    return False
 
 def navegar_para_clube(driver, wait):
     """Navega para a seção Clube"""
@@ -379,7 +335,7 @@ def main():
     
     try:
         print("="*60)
-        print("EA FC 25 WEB APP SCRAPER - AUTOMATIZADO")
+        print("EA FC 25 WEB APP SCRAPER")
         print("="*60)
         
         # 1. Configura driver
@@ -393,18 +349,10 @@ def main():
         driver.get("https://www.ea.com/ea-sports-fc/ultimate-team/web-app/")
         time.sleep(5)
         
-        # 3. Verifica se está logado
-        print("3. Verificando status de login...")
-        if not verificar_se_logado(driver, wait):
-            print("Usuário não está logado")
-            
-            # Tenta fazer login automático
-            if not fazer_login_automatico(driver, wait):
-                # Se não conseguir, pede login manual
-                if not aguardar_login_inicial():
-                    return
-        else:
-            print("✅ Usuário já está logado!")
+        # 3. Aguarda login manual
+        print("3. Aguardando login manual...")
+        if not aguardar_login():
+            return
         
         # 4. Navega para Clube
         print("4. Navegando para Clube...")
@@ -425,7 +373,6 @@ def main():
         if exportar_csv(jogadores):
             print("\n🎉 Scraping concluído com sucesso!")
             print("📊 Verifique o arquivo 'jogadores_fc25.csv'")
-            print("💾 Login salvo para próximas execuções")
         else:
             print("\n❌ Erro ao exportar dados")
         
