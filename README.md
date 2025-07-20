@@ -61,18 +61,37 @@ Este projeto permite coletar automaticamente informações de todos os jogadores
 - Google Chrome
 - Conta EA FC 25
 
-### 1. Clone o repositório
+### Opção 1: Executável (Recomendado)
+
+#### 1. Clone o repositório
 ```bash
 git clone <url-do-repositorio>
 cd ult-fc-cloner
 ```
 
-### 2. Crie um ambiente virtual
+#### 2. Execute o script de build
+```bash
+python build_exe.py
+```
+
+#### 3. Use o executável
+- Vá para a pasta `dist`
+- Execute `FC25_Scraper.exe` ou `Executar_Scraper.bat`
+
+### Opção 2: Execução via Python
+
+#### 1. Clone o repositório
+```bash
+git clone <url-do-repositorio>
+cd ult-fc-cloner
+```
+
+#### 2. Crie um ambiente virtual
 ```bash
 python -m venv .venv
 ```
 
-### 3. Ative o ambiente virtual
+#### 3. Ative o ambiente virtual
 ```bash
 # Windows
 .venv\Scripts\activate
@@ -81,19 +100,48 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 4. Instale as dependências
+#### 4. Instale as dependências
 ```bash
 pip install -r requirements.txt
 ```
 
 ## 🎯 Como Usar
 
-### Execução Simples
+### Usando o Executável (Recomendado)
+
+1. **Execute o executável**
+   - Vá para a pasta `dist`
+   - Execute `FC25_Scraper.exe` ou `Executar_Scraper.bat`
+
+2. **Configure o login** (opcional)
+   - Escolha entre login automático ou manual
+   - Para login automático, insira email e senha
+   - Para login manual, continue com a opção 3
+
+3. **Faça login manualmente**
+   - O navegador abrirá o EA FC 25 Web App
+   - Faça login na sua conta EA
+   - Navegue até "Clube > Jogadores"
+   - Pressione ENTER no terminal
+
+4. **Aguarde a coleta**
+   - O scraper processará automaticamente todas as páginas
+   - Você verá o progresso em tempo real
+   - Todos os jogadores serão coletados
+
+5. **Resultado**
+   - Arquivo `jogadores_fc25.csv` será gerado
+   - Preview dos dados será mostrado
+   - Estatísticas da coleta serão exibidas
+
+### Usando Python
+
+#### Execução Simples
 ```bash
 python fc25_scraper.py
 ```
 
-### Processo Completo
+#### Processo Completo
 
 1. **Execute o script**
    ```bash
@@ -198,16 +246,23 @@ Edite o arquivo `config.py` para personalizar:
 
 ```
 ult-fc-cloner/
-├── fc25_scraper.py      # Script principal
-├── config.py            # Configurações e credenciais
-├── requirements.txt     # Dependências Python
-├── setup.py            # Configuração do projeto
-├── README.md           # Este arquivo
-├── .gitignore          # Arquivos ignorados pelo Git
-├── .venv/              # Ambiente virtual
-├── __pycache__/        # Cache Python
-├── fc25_scraper.log    # Log de execução
-└── jogadores_fc25.csv  # Dados coletados
+├── fc25_scraper.py          # Script principal
+├── config.py                # Configurações e credenciais
+├── requirements.txt         # Dependências Python
+├── setup.py                # Configuração do projeto
+├── build_exe.py            # Script para criar executável
+├── fc25_scraper.spec       # Especificação PyInstaller
+├── file_version_info.txt   # Informações de versão do exe
+├── README.md               # Este arquivo
+├── .gitignore              # Arquivos ignorados pelo Git
+├── .venv/                  # Ambiente virtual
+├── __pycache__/            # Cache Python
+├── build/                  # Arquivos de build (gerado)
+├── dist/                   # Executável final (gerado)
+│   ├── FC25_Scraper.exe   # Executável principal
+│   └── Executar_Scraper.bat # Script de execução
+├── fc25_scraper.log        # Log de execução
+└── jogadores_fc25.csv      # Dados coletados
 ```
 
 ## 🛠️ Tecnologias Utilizadas
