@@ -285,69 +285,57 @@ class FC25Scraper:
             return False
     
     def navegar_para_jogadores(self):
-        """Tenta navegar automaticamente para a página de jogadores"""
+        """Navega para a seção de jogadores usando os seletores corretos"""
         try:
-            logger.info("Tentando navegar para a página de jogadores...")
+            logger.info("Navegando para seção de jogadores...")
             
-            # Aguarda carregamento da página principal
+            # Aguarda carregamento da página
             time.sleep(3)
             
-            # Procura por links/menus que levam ao clube
-            seletores_clube = [
-                'a[href*="club"]',
-                'a[href*="squad"]',
-                'button:contains("Club")',
-                'button:contains("Clube")',
-                '[data-testid*="club"]',
-                '.ut-club-link',
-                '.club-link'
-            ]
+            # Primeiro, clica no botão "Club" na navbar
+            try:
+                club_button = self.driver.find_element(By.CSS_SELECTOR, "button.ut-tab-bar-item.icon-club")
+                if club_button.is_displayed() and club_button.is_enabled():
+                    club_button.click()
+                    logger.info("Botão Club clicado com sucesso")
+                    time.sleep(3)
+                else:
+                    logger.warning("Botão Club não está visível ou habilitado")
+            except Exception as e:
+                logger.warning(f"Erro ao clicar no botão Club: {str(e)}")
             
-            link_clube = None
-            for seletor in seletores_clube:
-                try:
-                    link_clube = self.driver.find_element(By.CSS_SELECTOR, seletor)
-                    logger.info(f"Link do clube encontrado: {seletor}")
-                    break
-                except NoSuchElementException:
-                    continue
+            # Agora procura pelo tile "Players" no hub
+            try:
+                players_tile = self.driver.find_element(By.CSS_SELECTOR, "div.players-tile")
+                if players_tile.is_displayed():
+                    players_tile.click()
+                    logger.info("Tile Players clicado com sucesso")
+                    time.sleep(3)
+                    return True
+                else:
+                    logger.warning("Tile Players não está visível")
+            except Exception as e:
+                logger.warning(f"Erro ao clicar no tile Players: {str(e)}")
             
-            if link_clube:
-                link_clube.click()
-                logger.info("Clicou no link do clube")
-                time.sleep(3)
+            # Se não conseguir clicar no tile, tenta pelo header
+            try:
+                players_header = self.driver.find_element(By.XPATH, "//h1[contains(text(), 'Players')]")
+                if players_header.is_displayed():
+                    players_header.click()
+                    logger.info("Header Players clicado com sucesso")
+                    time.sleep(3)
+                    return True
+            except Exception as e:
+                logger.warning(f"Erro ao clicar no header Players: {str(e)}")
             
-            # Procura por links/menus que levam aos jogadores
-            seletores_jogadores = [
-                'a[href*="players"]',
-                'a[href*="squad"]',
-                'button:contains("Players")',
-                'button:contains("Jogadores")',
-                '[data-testid*="players"]',
-                '.ut-players-link',
-                '.players-link'
-            ]
-            
-            link_jogadores = None
-            for seletor in seletores_jogadores:
-                try:
-                    link_jogadores = self.driver.find_element(By.CSS_SELECTOR, seletor)
-                    logger.info(f"Link dos jogadores encontrado: {seletor}")
-                    break
-                except NoSuchElementException:
-                    continue
-            
-            if link_jogadores:
-                link_jogadores.click()
-                logger.info("Clicou no link dos jogadores")
-                time.sleep(3)
-                return True
-            
-            logger.warning("Não foi possível navegar automaticamente para jogadores")
-            return False
+            # Se nenhum método funcionar, tenta navegação manual
+            logger.warning("Navegação automática falhou. Aguardando navegação manual...")
+            input("Por favor, navegue manualmente para 'Club > Players' e pressione ENTER...")
+            time.sleep(3)
+            return True
             
         except Exception as e:
-            logger.error(f"Erro durante navegação automática: {str(e)}")
+            logger.error(f"Erro ao navegar para jogadores: {str(e)}")
             return False
     
     def localizar_cards_jogadores(self):
@@ -448,7 +436,19 @@ class FC25Scraper:
                 'Overall': 'N/A',
                 'Posição': 'N/A',
                 'Clube': 'N/A',
-                'Rating': 'N/A'
+                'Rating': 'N/A',
+                'Qualidade': 'N/A',
+                'Nação': 'N/A',
+                'Liga': 'N/A',
+                'PAC': 'N/A',
+                'SHO': 'N/A',
+                'PAS': 'N/A',
+                'DRI': 'N/A',
+                'DEF': 'N/A',
+                'PHY': 'N/A',
+                'Traits': 'N/A',
+                'Status': 'N/A',
+                'Posições_Alternativas': 'N/A'
             }
             
             # Extrai nome do jogador
@@ -551,6 +551,106 @@ class FC25Scraper:
                 
             except Exception as e:
                 logger.warning(f"Erro ao extrair clube: {str(e)}")
+            
+            # Extrai estatísticas detalhadas
+            try:
+                # Procura por estatísticas no componente de stats
+                stats_elements = card.find_elements(By.CSS_SELECTOR, '.player-stats-data-component li')
+                for stat in stats_elements:
+                    try:
+                        label = stat.find_element(By.CSS_SELECTOR, '.label').text.strip()
+                        value = stat.find_element(By.CSS_SELECTOR, '.value').text.strip()
+                        
+                        if label == 'PAC':
+                            jogador['PAC'] = value
+                        elif label == 'SHO':
+                            jogador['SHO'] = value
+                        elif label == 'PAS':
+                            jogador['PAS'] = value
+                        elif label == 'DRI':
+                            jogador['DRI'] = value
+                        elif label == 'DEF':
+                            jogador['DEF'] = value
+                        elif label == 'PHY':
+                            jogador['PHY'] = value
+                    except:
+                        continue
+            except Exception as e:
+                logger.warning(f"Erro ao extrair estatísticas: {str(e)}")
+            
+            # Extrai informações de nação, liga e clube
+            try:
+                # Procura por informações na seção bio
+                bio_rows = card.find_elements(By.CSS_SELECTOR, '.ut-item-view--bio .ut-item-row')
+                for row in bio_rows:
+                    try:
+                        label = row.find_element(By.CSS_SELECTOR, '.ut-item-row-label--left').text.strip()
+                        
+                        if label == 'IRE':
+                            jogador['Nação'] = 'Irlanda'
+                        elif label == 'ICN':
+                            jogador['Liga'] = 'Icon'
+                        elif label == 'CLB':  # Possível label para clube
+                            # Tenta extrair nome do clube
+                            try:
+                                clube_img = row.find_element(By.CSS_SELECTOR, 'img')
+                                clube_src = clube_img.get_attribute('src')
+                                if 'clubs' in clube_src:
+                                    jogador['Clube'] = 'Clube Detectado'  # Placeholder
+                            except:
+                                pass
+                    except:
+                        continue
+            except Exception as e:
+                logger.warning(f"Erro ao extrair nação/liga: {str(e)}")
+            
+            # Extrai qualidade do card
+            try:
+                # Verifica classes CSS para determinar qualidade
+                card_classes = card.get_attribute('class')
+                if 'specials' in card_classes:
+                    jogador['Qualidade'] = 'Special'
+                elif 'hero' in card_classes:
+                    jogador['Qualidade'] = 'Hero'
+                elif 'icon' in card_classes:
+                    jogador['Qualidade'] = 'Icon'
+                else:
+                    jogador['Qualidade'] = 'Base'
+            except Exception as e:
+                logger.warning(f"Erro ao extrair qualidade: {str(e)}")
+            
+            # Extrai status (tradeable/untradeable)
+            try:
+                nome_element = card.find_element(By.CSS_SELECTOR, '.name')
+                nome_classes = nome_element.get_attribute('class')
+                if 'untradeable' in nome_classes:
+                    jogador['Status'] = 'Untradeable'
+                else:
+                    jogador['Status'] = 'Tradeable'
+            except Exception as e:
+                logger.warning(f"Erro ao extrair status: {str(e)}")
+            
+            # Extrai posições alternativas
+            try:
+                posicoes_element = card.find_element(By.CSS_SELECTOR, '.otherPositions')
+                if posicoes_element.text.strip():
+                    jogador['Posições_Alternativas'] = posicoes_element.text.strip()
+            except:
+                pass  # Não há posições alternativas
+            
+            # Extrai traits
+            try:
+                traits_elements = card.find_elements(By.CSS_SELECTOR, '.ut-item-view--traits .ut-item-row .ut-item-row-label--left')
+                traits = []
+                for trait in traits_elements:
+                    trait_text = trait.text.strip()
+                    if trait_text and not trait_text.startswith('+') and not trait_text == '':
+                        traits.append(trait_text)
+                
+                if traits:
+                    jogador['Traits'] = ', '.join(traits[:3])  # Limita a 3 traits principais
+            except Exception as e:
+                logger.warning(f"Erro ao extrair traits: {str(e)}")
             
             # Copia overall para rating se rating estiver vazio
             if jogador['Rating'] == 'N/A' and jogador['Overall'] != 'N/A':

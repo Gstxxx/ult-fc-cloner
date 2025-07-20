@@ -121,17 +121,41 @@ python fc25_scraper.py
    - Preview dos dados será mostrado
    - Estatísticas da coleta serão exibidas
 
+## 📊 Dados Coletados
+
+### **Dados Básicos:**
+- **Nome**: Nome completo do jogador
+- **Overall**: Overall rating do jogador
+- **Posição**: Posição principal do jogador (ex: ST, CM, CB)
+- **Clube**: Clube atual do jogador
+- **Rating**: Rating geral (mesmo que Overall)
+
+### **Dados Expandidos:**
+- **Qualidade**: Tipo do card (Base, Special, Hero, Icon, TOTS, etc.)
+- **Nação**: Nacionalidade do jogador
+- **Liga**: Liga do jogador (ex: Icon, Premier League, etc.)
+- **Status**: Se o jogador é tradeable ou untradeable
+- **Posições_Alternativas**: Outras posições que o jogador pode jogar
+
+### **Estatísticas Detalhadas:**
+- **PAC**: Pace (Velocidade)
+- **SHO**: Shooting (Finalização)
+- **PAS**: Passing (Passe)
+- **DRI**: Dribbling (Drible)
+- **DEF**: Defending (Defesa)
+- **PHY**: Physical (Físico)
+
+### **Traits:**
+- **Traits**: Características especiais do jogador (ex: Pinged Pass, First Touch)
+
 ## 📊 Exemplo de Saída
 
 ### Arquivo CSV gerado:
 ```csv
-Nome,Overall,Posição,Clube,Rating
-Essien,97,CDM,N/A,97
-Kanu,97,ST,N/A,97
-Yıldız,96,LW,N/A,96
-Shaw,95,ST,N/A,95
-Pacho,95,CB,N/A,95
-van Dijk,94,CB,N/A,94
+Nome,Overall,Posição,Clube,Rating,Qualidade,Nação,Liga,PAC,SHO,PAS,DRI,DEF,PHY,Traits,Status,Posições_Alternativas
+Essien,97,CDM,N/A,97,Icon,Gana,Icon,85,73,89,85,90,91,Pinged Pass,First Touch,Tradeable,CM
+Kanu,97,ST,N/A,97,Icon,Nigéria,Icon,87,95,78,88,45,82,Power Header,Untradeable,
+Yıldız,96,LW,N/A,96,TOTS,Turquia,Super Lig,92,88,85,94,45,78,Flair,Untradeable,RW
 ...
 ```
 
@@ -196,7 +220,15 @@ ult-fc-cloner/
 
 ## 🔍 Como Funciona Tecnicamente
 
-### 1. **Detecção de Cards**
+### 1. **Navegação**
+```python
+# Navegação para Club > Players
+"button.ut-tab-bar-item.icon-club"  # Botão Club na navbar
+"div.players-tile"                  # Tile Players no hub
+"h1:contains('Players')"           # Header Players
+```
+
+### 2. **Detecção de Cards**
 ```python
 # Seletor principal para cards de jogadores
 "li.listFUTItem"  # Container principal do card
@@ -205,20 +237,39 @@ ult-fc-cloner/
 ".position"       # Posição
 ```
 
-### 2. **Paginação**
+### 3. **Extração de Dados Expandidos**
+```python
+# Estatísticas detalhadas
+".player-stats-data-component li"   # Container de stats
+".label"                           # Label da stat (PAC, SHO, etc.)
+".value"                           # Valor da stat
+
+# Informações de nação/liga
+".ut-item-view--bio .ut-item-row"  # Seção bio
+".ut-item-row-label--left"         # Labels (IRE, ICN, etc.)
+
+# Traits
+".ut-item-view--traits .ut-item-row .ut-item-row-label--left"
+
+# Qualidade do card
+card.get_attribute('class')        # Classes CSS para determinar qualidade
+```
+
+### 4. **Paginação**
 ```python
 # Detecta botão "Próxima"
 "button.pagination.next"
 "button.flat.pagination.next"
 ```
 
-### 3. **Extração de Dados**
+### 5. **Extração de Dados**
 - Usa seletores CSS precisos
 - Valida dados antes de adicionar
 - Filtra cards vazios ou inválidos
 - Trata caracteres especiais
+- Extrai dados expandidos (stats, traits, qualidade)
 
-### 4. **Robustez**
+### 6. **Robustez**
 - Múltiplos métodos de inicialização do driver
 - Fallbacks para diferentes cenários
 - Tratamento de erros abrangente
