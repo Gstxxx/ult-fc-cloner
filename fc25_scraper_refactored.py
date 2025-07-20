@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-EA FC 25 Web App Scraper - Versão Refatorada
+EA FC 25 Web App Scraper - Versão Simplificada
 Script principal para coletar dados dos jogadores do EA FC 25 Web App
 """
 
@@ -18,7 +18,7 @@ from exporters.csv_exporter import CSVExporter
 class FC25Scraper:
     """
     Classe principal para fazer web scraping dos jogadores do EA FC 25 Web App
-    Versão refatorada com módulos separados
+    Versão simplificada - apenas login manual
     """
     
     def __init__(self):
@@ -69,23 +69,8 @@ class FC25Scraper:
             return False
     
     def fazer_login(self):
-        """Gerencia o processo de login"""
-        try:
-            # Tenta login automático se credenciais estiverem configuradas
-            if self.config.auto_login:
-                self.logger.info("Tentando login automático...")
-                if self.login_manager.fazer_login_automatico():
-                    if self.login_manager.verificar_login_sucesso():
-                        self.logger.info("Login automático bem-sucedido")
-                        return True
-            
-            # Se login automático falhou, faz login manual
-            self.logger.info("Fazendo login manual...")
-            return self.login_manager.aguardar_login()
-            
-        except Exception as e:
-            self.logger.error(f"Erro durante login: {str(e)}")
-            return False
+        """Aguarda login manual do usuário"""
+        return self.login_manager.aguardar_login()
     
     def navegar_para_jogadores(self):
         """Navega para a página de jogadores"""
@@ -168,8 +153,8 @@ class FC25Scraper:
             if not self.acessar_webapp():
                 return False
             
-            # 4. Faz login
-            self.logger.info("4. Fazendo login...")
+            # 4. Aguarda login manual
+            self.logger.info("4. Aguardando login manual...")
             if not self.fazer_login():
                 return False
             
@@ -214,13 +199,8 @@ class FC25Scraper:
 def main():
     """Função principal"""
     try:
-        # Carrega configurações
-        config = Config()
-        config.carregar_credenciais()
-        
         # Cria e executa scraper
         scraper = FC25Scraper()
-        scraper.config = config
         
         # Executa scraping
         sucesso = scraper.executar_scraping()
